@@ -1,14 +1,14 @@
 {
-  "name": "LMS صوتي",
-  "short_name": "LMS",
-  "start_url": "/SMART/index.html",
+  "name": "SMART Assistant",
+  "short_name": "SMART",
+  "start_url": "/index.html",
   "display": "standalone",
-  "background_color": "#f8fafc",
+  "background_color": "#ffffff",
   "theme_color": "#4f46e5",
   "icons": [
     {
-      "src": "icon-192.png",
-      "sizes": "192x192",
+      "src": "https://cdn-icons-png.flaticon.com/512/2040/2040504.png",
+      "sizes": "512x512",
       "type": "image/png"
     }
   ]
