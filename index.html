@@ -38,7 +38,7 @@
 
         textarea { width: 100%; height: 180px; border-radius: 15px; border: 2px solid #eee; padding: 15px; font-size: 16px; resize: none; box-sizing: border-box; line-height: 1.6; transition: 0.3s;}
         
-        /* الأدوات الهندسية وتصميم الآلة الحاسبة */
+        /* الأدوات الهندسية */
         .tool-box { background: var(--bg); padding: 15px; border-radius: 15px; margin-top: 10px; }
         input[type="text"], input[type="number"], select { width: 100%; padding: 10px; margin: 5px 0; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; font-size: 1rem;}
         
@@ -51,9 +51,23 @@
 
         .status { font-size: 0.85rem; color: var(--primary); margin: 10px 0; height: 15px; text-align: center; font-weight: bold;}
         
+        /* =========================================
+           إعدادات الطباعة الجديدة (لحل الورقة البيضاء) 
+           ========================================= */
+        #printArea { display: none; } /* مخفي في الوضع الطبيعي */
+        
         @media print {
-            body * { visibility: hidden; }
-            #txtInput { visibility: visible; position: absolute; left: 0; top: 0; width: 100%; height: auto; border: none; font-size: 16pt; padding: 20px;}
+            body { background: white; }
+            .app-container { display: none !important; } /* إخفاء التطبيق بالكامل أثناء الطباعة */
+            #printArea {
+                display: block !important;
+                font-size: 16pt;
+                white-space: pre-wrap; /* يحافظ على المسافات والأسطر */
+                direction: rtl;
+                color: black;
+                font-family: Arial, sans-serif;
+                padding: 20px;
+            }
         }
     </style>
 </head>
@@ -82,7 +96,7 @@
             <button onclick="changeFontSize(2)">A+ تكبير الخط</button>
             <button onclick="changeFontSize(-2)">A- تصغير الخط</button>
         </div>
-        <textarea id="txtInput" placeholder="اكتب هنا أو استخدم الأدوات (الصوت، الصور)..."></textarea>
+        <textarea id="txtInput" placeholder="اكتب ملاحظاتك هنا..."></textarea>
     </div>
 
     <div id="eng" class="tab-content">
@@ -154,12 +168,13 @@
     </div>
 
     <div style="text-align:center; margin-top:20px; font-size:0.8rem; opacity:0.7">
-        إعداد المهندسة خولة المحجوبي &copy;
+        إعداد المهندسة خولة المحجوبي ©
     </div>
 </div>
 
+<div id="printArea"></div>
+
 <script>
-    // نظام التبويبات
     function openTab(tabName) {
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -173,7 +188,6 @@
 
     function setStatus(msg) { status.innerText = msg; }
 
-    // تكبير وتصغير الخط
     function changeFontSize(step) {
         currentFontSize += step;
         if(currentFontSize < 12) currentFontSize = 12; 
@@ -182,7 +196,6 @@
         setStatus(`حجم الخط الآن: ${currentFontSize}`);
     }
 
-    // القراءة والايقاف
     const synth = window.speechSynthesis;
     function handleSpeak() {
         if (!txtInput.value.trim()) { setStatus("⚠️ النص فارغ!"); return; }
@@ -195,7 +208,6 @@
 
     function handleStop() { synth.cancel(); setStatus("⏹️ تم إيقاف القراءة"); }
 
-    // الإملاء
     function handleDictation() {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         if(!SpeechRecognition){ setStatus("❌ متصفحك لا يدعم الإملاء"); return; }
@@ -209,7 +221,6 @@
         recognition.start();
     }
 
-    // الترجمة
     async function handleTranslate() {
         if (!txtInput.value.trim()) return;
         setStatus("⏳ جاري الترجمة...");
@@ -229,12 +240,10 @@
         setStatus("✅ تم نسخ النص");
     }
 
-    // الآلة الحاسبة
     const calcDisplay = document.getElementById('calcDisplay');
     function calcAction(val) {
-        if (val === 'C') {
-            calcDisplay.value = '';
-        } else if (val === '=') {
+        if (val === 'C') { calcDisplay.value = ''; } 
+        else if (val === '=') {
             try {
                 let equation = calcDisplay.value.replace(/×/g, '*').replace(/÷/g, '/');
                 calcDisplay.value = eval(equation) || '';
@@ -248,7 +257,6 @@
         }
     }
 
-    // محول الوحدات
     function convertUnits() {
         const val = parseFloat(document.getElementById('unitVal').value) || 0;
         const type = document.getElementById('unitType').value;
@@ -259,65 +267,75 @@
         if(type === "km-m") res = (val * 1000) + " متر";
         if(type === "in-cm") res = (val * 2.54).toFixed(2) + " سم";
         if(type === "ft-m") res = (val * 0.3048).toFixed(2) + " متر";
-        
         if(type === "kg-g") res = (val * 1000) + " جرام";
         if(type === "kg-lb") res = (val * 2.20462).toFixed(2) + " باوند (lb)";
         if(type === "lb-kg") res = (val / 2.20462).toFixed(2) + " كجم";
-        
         if(type === "c-f") res = ((val * 9/5) + 32).toFixed(2) + " فهرنهايت (°F)";
         if(type === "f-c") res = ((val - 32) * 5/9).toFixed(2) + " مئوي (°C)";
 
         document.getElementById('unitResult').innerText = "النتيجة: " + res;
     }
 
-    // --- الوظائف المتقدمة ---
-    
-    // 1. استخراج النص من الصورة
+    // ==========================================
+    // دالة استخراج النص من الصورة + تنظيف النص
+    // ==========================================
     function extractText(input) {
         if(!input.files[0]) return;
         setStatus("⏳ جاري تحليل الصورة... يرجى الانتظار");
         Tesseract.recognize(input.files[0], 'ara+eng').then(({ data: { text } }) => {
-            txtInput.value += "\n\n" + text.trim() + "\n";
-            setStatus("✅ تم استخراج النص بنجاح");
+            
+            // فلتر لتنظيف النص من الشوائب والأسطر الفارغة
+            let cleanText = text.replace(/[`~|\\_]/g, '')  // مسح الرموز العشوائية
+                                .replace(/\n\s*\n/g, '\n') // مسح الأسطر الفارغة الزائدة
+                                .trim();                   // مسح المسافات من البداية والنهاية
+
+            txtInput.value += "\n\n" + cleanText + "\n";
+            setStatus("✅ تم استخراج وتنظيف النص بنجاح");
         }).catch(err => setStatus("❌ فشل في قراءة الصورة"));
     }
 
-    // 2. معاينة وحفظ PDF
+    // ==========================================
+    // دالة الطباعة المعدلة لحل الورقة البيضاء
+    // ==========================================
     function previewAndPrintPDF() {
-        if (!txtInput.value.trim()) { setStatus("⚠️ لا يوجد نص لحفظه!"); return; }
-        setStatus("📄 جاري فتح المعاينة...");
-        window.print();
-        setStatus("✅ تمت المعاينة");
+        const textToPrint = txtInput.value.trim();
+        if (!textToPrint) { 
+            setStatus("⚠️ لا يوجد نص لحفظه! اكتبي شيئاً أولاً."); 
+            return; 
+        }
+        
+        // وضع النص في المكان المخصص للطباعة
+        document.getElementById('printArea').innerText = textToPrint;
+        setStatus("📄 جاري تجهيز المعاينة...");
+
+        // تأخير زمني بسيط جداً لإعطاء المتصفح فرصة لتحديث الورقة قبل طباعتها
+        setTimeout(() => {
+            window.print();
+            setStatus("✅ تمت المعاينة");
+        }, 500); 
     }
 
-    // 3. جلب الموقع (مصحح)
     function getLocation() {
         if (navigator.geolocation) {
-            setStatus("📍 جاري تحديد إحداثيات الموقع...");
+            setStatus("📍 جاري تحديد الإحداثيات...");
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     const lat = position.coords.latitude.toFixed(6);
                     const lon = position.coords.longitude.toFixed(6);
-                    const mapsLink = `https://maps.google.com/?q=${lat},${lon}`;
-                    
-                    txtInput.value += `\n\n📍 إحداثيات الموقع الميداني:\n- خط العرض: ${lat}\n- خط الطول: ${lon}\n- الرابط: ${mapsLink}\n`;
-                    setStatus("✅ تم إدراج الموقع الجغرافي");
+                    const mapsLink = `http://googleusercontent.com/maps.google.com/3{lat},${lon}`;
+                    txtInput.value += `\n\n📍 إحداثيات الموقع:\n- العرض: ${lat}\n- الطول: ${lon}\n- الرابط: ${mapsLink}\n`;
+                    setStatus("✅ تم إدراج الموقع");
                 },
-                (error) => {
-                    setStatus("❌ يرجى تفعيل الـ GPS والسماح للمتصفح بمعرفة موقعك");
-                }
+                (error) => { setStatus("❌ يرجى تفعيل الـ GPS والسماح للمتصفح بالموقع"); }
             );
-        } else {
-            setStatus("❌ متصفحك لا يدعم تحديد الموقع");
-        }
+        } else { setStatus("❌ متصفحك لا يدعم تحديد الموقع"); }
     }
 
-    // 4. الوقت والتاريخ
     function addTimestamp() {
         const now = new Date();
         const timeString = now.toLocaleString('ar-EG');
         txtInput.value += `\n⏱️ [${timeString}]:\n`;
-        setStatus("✅ تمت إضافة الوقت والتاريخ");
+        setStatus("✅ تمت الإضافة");
         txtInput.focus();
     }
 
