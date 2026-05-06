@@ -10,159 +10,220 @@
     <style>
         :root { 
             --primary: #4f46e5; --secondary: #10b981; --bg: #f8fafc; 
-            --card-bg: #ffffff; --text: #1e293b; 
+            --card-bg: #ffffff; --text: #1e293b; --danger: #dc2626;
         }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 10px; transition: 0.3s; }
-        .app-container { max-width: 500px; margin: auto; background: var(--card-bg); border-radius: 2rem; padding: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: var(--bg); color: var(--text); 
+            margin: 0; padding: 10px; transition: 0.3s; 
+        }
+
+        .app-container { 
+            max-width: 500px; margin: auto; 
+            background: var(--card-bg); border-radius: 2rem; 
+            padding: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+        }
 
         /* التبويبات */
-        .tabs { display: flex; justify-content: space-around; margin-bottom: 15px; border-bottom: 2px solid #eee; }
-        .tab-btn { padding: 10px; cursor: pointer; border: none; background: none; color: var(--text); font-weight: bold; opacity: 0.6; }
+        .tabs { display: flex; justify-content: space-around; margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; }
+        .tab-btn { 
+            padding: 12px; cursor: pointer; border: none; background: none; 
+            color: var(--text); font-weight: bold; opacity: 0.5; font-size: 1rem;
+        }
         .tab-btn.active { opacity: 1; border-bottom: 3px solid var(--primary); color: var(--primary); }
-        .tab-content { display: none; }
+        .tab-content { display: none; animation: fadeIn 0.3s ease; }
         .tab-content.active { display: block; }
 
-        /* الأزرار */
-        .grid-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        button { padding: 10px; border-radius: 12px; border: 1px solid #ddd; background: #f9f9f9; color: #333; cursor: pointer; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 5px; transition: 0.2s;}
-        button:active { transform: scale(0.95); }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* القوائم والأزرار */
+        .grid-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
+        button { 
+            padding: 12px; border-radius: 12px; border: 1px solid #e2e8f0; 
+            background: #fff; color: #333; cursor: pointer; font-weight: 600; 
+            display: flex; align-items: center; justify-content: center; 
+            gap: 8px; transition: 0.2s; font-size: 0.95rem;
+        }
+        button:active { transform: scale(0.96); }
         .btn-main { background: var(--primary); color: white; border: none; }
         .btn-success { background: var(--secondary); color: white; border: none; }
-        .btn-danger { background: #fee2e2; color: #dc2626; border: none; }
-        
-        /* صندوق النص المعدل - قابل للتعديل */
+        .btn-danger { background: #fee2e2; color: var(--danger); border: none; }
+        .btn-black { background: #1e293b; color: white; border: none; }
+
+        /* منطقة النصوص */
+        .editor-label { font-size: 0.9rem; font-weight: bold; color: var(--primary); margin-bottom: 8px; display: block; }
         textarea { 
-            width: 100%; 
-            height: 250px; /* زيادة الطول لسهولة التعديل */
-            border-radius: 15px; 
-            border: 2px solid #4f46e5; 
-            padding: 15px; 
-            font-size: 16px; 
-            resize: vertical; 
-            box-sizing: border-box; 
-            line-height: 1.6; 
-            background: #fff;
-            color: #333;
+            width: 100%; height: 280px; border-radius: 15px; 
+            border: 2px solid #e2e8f0; padding: 15px; font-size: 16px; 
+            resize: none; box-sizing: border-box; line-height: 1.7; 
+            background: #fff; color: #1e293b; transition: border-color 0.3s;
         }
-        
-        .status { font-size: 0.85rem; color: var(--primary); margin: 10px 0; text-align: center; font-weight: bold; min-height: 1.2em; }
-        
-        /* إعدادات الطباعة لضمان ظهور النص المعدل */
+        textarea:focus { border-color: var(--primary); outline: none; }
+
+        .status-bar { 
+            font-size: 0.85rem; color: var(--primary); 
+            margin: 10px 0; text-align: center; font-weight: bold; 
+            background: #eff6ff; padding: 8px; border-radius: 8px;
+        }
+
+        /* الطباعة */
+        #printArea { display: none; }
         @media print {
             body * { visibility: hidden; }
             #printArea { 
-                visibility: visible; 
-                position: absolute; 
-                left: 0; top: 0; width: 100%; 
-                padding: 30px; 
-                direction: rtl; 
-                white-space: pre-wrap; 
-                font-size: 18pt;
-                line-height: 1.8;
-                display: block !important; 
+                visibility: visible; position: absolute; left: 0; top: 0; 
+                width: 100%; padding: 40px; direction: rtl; 
+                white-space: pre-wrap; font-size: 16pt; line-height: 1.8;
+                display: block !important; color: black;
             }
         }
-        #printArea { display: none; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    <h3 style="text-align:center; color:var(--primary)">المساعد الهندسي SMART</h3>
+    <h3 style="text-align:center; color:var(--primary); margin-top: 0;">المساعد الهندسي SMART</h3>
     
     <div class="tabs">
-        <button class="tab-btn active" onclick="openTab('main')">الرئيسية</button>
-        <button class="tab-btn" onclick="openTab('adv')">متقدم (معالجة الصور)</button>
+        <button class="tab-btn active" onclick="openTab('main', this)">الرئيسية</button>
+        <button class="tab-btn" onclick="openTab('adv', this)">متقدم (الصور)</button>
     </div>
 
-    <div id="status" class="status">جاهز للعمل..</div>
+    <div id="status" class="status-bar">جاهز للعمل..</div>
 
     <div id="main" class="tab-content active">
-        <textarea id="txtMain" placeholder="اكتب ملاحظاتك السريعة هنا..."></textarea>
-        <div class="grid-menu" style="margin-top:10px;">
-            <button class="btn-main" onclick="copyToClipboard('txtMain')">📋 نسخ</button>
-            <button class="btn-danger" onclick="clearText('txtMain')">🗑️ مسح</button>
+        <span class="editor-label">مفكرة المهندسة:</span>
+        <textarea id="txtMain" placeholder="اكتبي ملاحظاتك الهندسية هنا..."></textarea>
+        <div class="grid-menu" style="margin-top:15px;">
+            <button class="btn-main" onclick="handleDictation('txtMain')">🎤 إملاء صوتي</button>
+            <button onclick="copyText('txtMain')">📋 نسخ</button>
+            <button class="btn-main" onclick="handleSpeak('txtMain')">🔊 قراءة</button>
+            <button class="btn-danger" onclick="clearArea('txtMain')">🗑️ مسح</button>
         </div>
     </div>
 
     <div id="adv" class="tab-content">
         <div class="grid-menu">
-            <button class="btn-main" onclick="document.getElementById('imgInput').click()" style="grid-column: span 2; padding: 15px; font-size: 1.1rem;">📷 اختر صورة لاستخراج النص</button>
+            <button class="btn-main" onclick="document.getElementById('imgInput').click()" style="grid-column: span 2; padding: 18px; font-size: 1.1rem;">📷 اختاري صورة المشروع</button>
         </div>
+        <input type="file" id="imgInput" hidden accept="image/*" onchange="processImage(this)">
         
-        <input type="file" id="imgInput" hidden accept="image/*" onchange="extractText(this)">
-        
-        <label style="font-size: 0.9rem; font-weight: bold; color: var(--primary);">📝 المعاينة والتعديل قبل الطباعة:</label>
-        <textarea id="txtAdv" placeholder="سيظهر النص هنا.. يمكنك حذفه، تعديله، أو الإضافة عليه بحرية قبل الطباعة."></textarea>
+        <span class="editor-label">تحرير النص المستخرج:</span>
+        <textarea id="txtAdv" placeholder="سيظهر النص المستخرج هنا.. يمكنكِ التعديل عليه أو الإضافة قبل الطباعة."></textarea>
         
         <div class="grid-menu" style="margin-top:15px;">
-            <button class="btn-success" onclick="cleanExtractedText()">🧹 تنظيف ذكي</button>
-            <button onclick="copyToClipboard('txtAdv')">📋 نسخ النص</button>
-            <button class="btn-main" onclick="printText('txtAdv')" style="grid-column: span 2; background: #000; color: #fff;">📄 حفظ كـ PDF (النص المعدل)</button>
-            <button class="btn-danger" onclick="clearText('txtAdv')" style="grid-column: span 2;">🗑️ إفراغ المربع</button>
+            <button class="btn-success" onclick="cleanText()">🧹 تنظيف النص</button>
+            <button onclick="copyText('txtAdv')">📋 نسخ</button>
+            <button class="btn-black" onclick="handlePrint('txtAdv')" style="grid-column: span 2;">📄 حفظ كـ PDF (النص الحالي)</button>
+            <button class="btn-danger" onclick="clearArea('txtAdv')" style="grid-column: span 2;">🗑️ إفراغ المربع</button>
         </div>
     </div>
 
-    <div style="text-align:center; margin-top:20px; font-size:0.8rem; opacity:0.7">
-        إعداد المهندسة خولة المحجوبي ©
+    <div style="text-align:center; margin-top:20px; font-size:0.8rem; opacity:0.6">
+        تطوير المهندسة خولة المحجوبي © 2026
     </div>
 </div>
 
 <div id="printArea"></div>
 
 <script>
-    function openTab(tabName) {
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    // التنقل بين التبويبات
+    function openTab(tabId, btn) {
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(tabName).classList.add('active');
-        event.currentTarget.classList.add('active');
+        document.getElementById(tabId).classList.add('active');
+        btn.classList.add('active');
     }
 
     function setStatus(msg) { document.getElementById('status').innerText = msg; }
 
-    // وظيفة استخراج النص
-    function extractText(input) {
+    // --- معالجة الصور واستخراج النص ---
+    function processImage(input) {
         if(!input.files[0]) return;
-        setStatus("⏳ جاري قراءة الصورة بدقة...");
+        setStatus("⏳ جاري قراءة الصورة وتجهيز النص...");
+        
         Tesseract.recognize(input.files[0], 'ara+eng').then(({ data: { text } }) => {
             document.getElementById('txtAdv').value = text;
-            setStatus("✅ تم الاستخراج. يمكنك التعديل على النص الآن.");
+            setStatus("✅ تمت القراءة! يمكنك التعديل الآن.");
         }).catch(err => {
-            setStatus("❌ خطأ في القراءة");
+            setStatus("❌ فشل في قراءة الصورة");
+            console.error(err);
         });
     }
 
-    // تنظيف النص مع الحفاظ على ما عدلته المهندسة
-    function cleanExtractedText() {
+    // --- تنظيف النص من الشوائب والرموز ---
+    function cleanText() {
         let area = document.getElementById('txtAdv');
         if(!area.value) return;
-        area.value = area.value
-            .replace(/[`~|\\_]/g, '') 
+        
+        // مسح الرموز الغريبة والأسطر الفارغة الزائدة
+        let cleaned = area.value
+            .replace(/[`~|\\_/*]/g, '') 
             .replace(/\n\s*\n/g, '\n')
             .trim();
-        setStatus("🧹 تم التنظيف التلقائي");
+        
+        area.value = cleaned;
+        setStatus("🧹 تم تنظيف النص وتنسيقه");
     }
 
-    function copyToClipboard(areaId) {
+    // --- الطباعة (PDF) ---
+    function handlePrint(areaId) {
+        let content = document.getElementById(areaId).value.trim();
+        if(!content) { setStatus("⚠️ المربع فارغ، لا يوجد ما نطبعه!"); return; }
+        
+        setStatus("📄 جاري تجهيز ملف PDF...");
+        document.getElementById('printArea').innerText = content;
+        
+        // تأخير بسيط لضمان تحديث مساحة الطباعة
+        setTimeout(() => {
+            window.print();
+            setStatus("✅ تم إرسال الأمر للطباعة");
+        }, 300);
+    }
+
+    // --- النسخ ---
+    function copyText(areaId) {
         let text = document.getElementById(areaId).value;
+        if(!text) return;
         navigator.clipboard.writeText(text);
-        setStatus("✅ تم النسخ");
+        setStatus("📋 تم النسخ بنجاح");
     }
 
-    // طباعة النص الظاهر حالياً (بما في ذلك التعديلات اليدوية)
-    function printText(areaId) {
-        let text = document.getElementById(areaId).value;
-        if(!text) { setStatus("⚠️ لا يوجد نص للطباعة"); return; }
-        document.getElementById('printArea').innerText = text;
-        window.print();
-    }
-
-    function clearText(areaId) {
-        if(confirm("سيتم مسح النص تماماً، هل أنتِ متأكدة؟")) {
+    // --- المسح ---
+    function clearArea(areaId) {
+        if(confirm("هل أنتِ متأكدة من مسح النص؟")) {
             document.getElementById(areaId).value = "";
             setStatus("🗑️ تم المسح");
         }
     }
+
+    // --- الإملاء الصوتي ---
+    function handleDictation(areaId) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if(!SpeechRecognition) { setStatus("❌ المتصفح لا يدعم الإملاء"); return; }
+        
+        const rec = new SpeechRecognition();
+        rec.lang = 'ar-SA';
+        rec.onstart = () => setStatus("🎤 اسمعك.. تحدثي الآن");
+        rec.onresult = (e) => { 
+            document.getElementById(areaId).value += " " + e.results[0][0].transcript; 
+            setStatus("✅ تم تسجيل الصوت");
+        };
+        rec.start();
+    }
+
+    // --- قراءة النص بصوت ---
+    function handleSpeak(areaId) {
+        let text = document.getElementById(areaId).value;
+        if(!text) return;
+        window.speechSynthesis.cancel();
+        let speech = new SpeechSynthesisUtterance(text);
+        speech.lang = 'ar-SA';
+        window.speechSynthesis.speak(speech);
+        setStatus("🔊 جاري القراءة...");
+    }
 </script>
+
 </body>
 </html>
