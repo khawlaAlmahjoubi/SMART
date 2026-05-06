@@ -3,169 +3,165 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Engineers Assistant</title>
     
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#4f46e5">
-    <link rel="manifest" href="manifest.json"> <title>SMART Assistant v2.0</title>
-    
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.1/dist/tesseract.min.js"></script>
 
     <style>
-        :root { --p: #4f46e5; --bg: #f8fafc; }
-        body { font-family: system-ui, sans-serif; background: var(--bg); margin: 0; padding: 15px; }
-        .app-card { max-width: 500px; margin: auto; background: white; border-radius: 20px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
-        
-        /* شريط الحالة والتحميل */
-        #status { font-size: 0.8rem; color: var(--p); text-align: center; margin-bottom: 10px; font-weight: bold; }
-        .progress-bar { height: 4px; background: #eee; border-radius: 2px; overflow: hidden; display: none; }
-        #progress { height: 100%; background: var(--p); width: 0%; transition: 0.3s; }
+        :root { --p: #2563eb; --bg: #fdfdfd; --dark: #1e293b; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 12px; color: var(--dark); }
+        .container { max-width: 450px; margin: auto; }
 
-        .tabs { display: flex; gap: 5px; background: #f1f5f9; padding: 5px; border-radius: 12px; margin-bottom: 20px; }
-        .tab { flex: 1; padding: 10px; border: none; background: none; cursor: pointer; border-radius: 8px; font-weight: bold; color: #64748b; }
-        .tab.active { background: white; color: var(--p); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        /* الأزرار العلوية */
+        .tabs { display: flex; gap: 8px; margin-bottom: 15px; }
+        .tab { flex: 1; padding: 12px; border: none; border-radius: 12px; background: #f1f5f9; font-weight: bold; color: #64748b; cursor: pointer; transition: 0.3s; }
+        .tab.active { background: var(--p); color: white; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
 
-        textarea { width: 100%; height: 200px; border: 2px solid #f1f5f9; border-radius: 12px; padding: 12px; font-size: 16px; box-sizing: border-box; outline: none; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-        button { padding: 12px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; background: var(--p); color: white; }
-        button.sec { background: #e2e8f0; color: #1e293b; }
+        /* منطقة العمل */
+        .card { background: white; border-radius: 20px; padding: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; }
+        textarea { width: 100%; height: 180px; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 12px; font-size: 16px; box-sizing: border-box; resize: none; margin-bottom: 10px; }
 
-        /* معاينة الصورة لضمان عدم ظهورها فارغة */
-        #imgPreview { width: 100%; max-height: 200px; object-fit: contain; margin-top: 10px; display: none; border-radius: 10px; border: 1px solid #ddd; }
+        /* الأزرار الاحترافية */
+        .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .btn { padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.9rem; }
+        .btn-blue { background: var(--p); color: white; }
+        .btn-gray { background: #f1f5f9; color: var(--dark); }
+
+        /* آلة حاسبة بتصميم "آيفون" احترافي */
+        .calc { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; background: #f8fafc; padding: 15px; border-radius: 20px; }
+        .calc-screen { grid-column: span 4; background: transparent; text-align: left; font-size: 2rem; padding: 10px; border-bottom: 1px solid #ddd; margin-bottom: 10px; min-height: 50px; overflow: hidden; }
+        .c-btn { padding: 18px; border-radius: 50%; border: none; background: white; font-weight: bold; font-size: 1.2rem; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .c-op { background: #fee2e2; color: #ef4444; }
+        .c-eq { background: #2563eb; color: white; }
+
+        #status { font-size: 0.75rem; text-align: center; color: var(--p); margin-top: 8px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="app-card">
-    <div id="status">جاهز للعمل بدون إنترنت ✅</div>
-    <div class="progress-bar" id="pBar"><div id="progress"></div></div>
-
+<div class="container">
     <div class="tabs">
-        <button class="tab active" onclick="switchTab('main', this)">الرئيسية</button>
-        <button class="tab" onclick="switchTab('ocr', this)">OCR</button>
-        <button class="tab" onclick="switchTab('about', this)">حول</button>
+        <button class="tab active" onclick="sw('main', this)">المذكرة</button>
+        <button class="tab" onclick="sw('eng', this)">الحاسبة</button>
+        <button class="tab" onclick="sw('ocr', this)">الصور</button>
     </div>
 
-    <div id="main" class="tab-content">
-        <textarea id="txtMain" placeholder="اكتبي هنا.. سيتم الحفظ تلقائياً"></textarea>
-        <div class="grid">
-            <button onclick="playAudio('txtMain')">🔊 تشغيل الصوت</button>
-            <button onclick="startDictation('txtMain')">🎤 إملاء صوتي</button>
+    <div id="main" class="section">
+        <div class="card">
+            <textarea id="txtMain" placeholder="اكتبي ملاحظاتك هنا..."></textarea>
+            <div class="btn-row">
+                <button class="btn btn-blue" onclick="startSpeech()">🎤 إملاء (تحدثي)</button>
+                <button class="btn btn-blue" onclick="playText()">🔊 استماع</button>
+                <button class="btn btn-gray" onclick="translateText()">🌐 ترجمة للعربية</button>
+                <button class="btn btn-gray" style="color:red" onclick="cls()">🗑️ مسح</button>
+            </div>
+            <div id="status">جاهز..</div>
         </div>
     </div>
 
-    <div id="ocr" class="tab-content" style="display:none">
-        <input type="file" id="fileIn" accept="image/*" hidden onchange="processOCR(this)">
-        <button style="width:100%" onclick="document.getElementById('fileIn').click()">📷 التقط صورة أو اختر ملف</button>
-        <img id="imgPreview">
-        <textarea id="txtOCR" style="margin-top:10px" placeholder="النص المستخلص سيظهر هنا.."></textarea>
+    <div id="eng" class="section" style="display:none">
+        <div class="card">
+            <div id="screen" class="calc-screen">0</div>
+            <div class="calc">
+                <button class="c-btn c-op" onclick="c('C')">AC</button>
+                <button class="c-btn c-op" onclick="c('/')">÷</button>
+                <button class="c-btn c-op" onclick="c('*')">×</button>
+                <button class="c-btn c-op" onclick="c('-')">-</button>
+                <button class="c-btn" onclick="c('7')">7</button>
+                <button class="c-btn" onclick="c('8')">8</button>
+                <button class="c-btn" onclick="c('9')">9</button>
+                <button class="c-btn c-op" onclick="c('+')">+</button>
+                <button class="c-btn" onclick="c('4')">4</button>
+                <button class="c-btn" onclick="c('5')">5</button>
+                <button class="c-btn" onclick="c('6')">6</button>
+                <button class="c-btn c-eq" onclick="c('=')">=</button>
+                <button class="c-btn" onclick="c('1')">1</button>
+                <button class="c-btn" onclick="c('2')">2</button>
+                <button class="c-btn" onclick="c('3')">3</button>
+                <button class="c-btn" onclick="c('0')">0</button>
+            </div>
+        </div>
     </div>
 
-    <div id="about" class="tab-content" style="display:none">
-        <h3>حول المنصة</h3>
-        <p>هذا التطبيق مصمم لخدمة المهندسين ميدانياً. يعمل بتقنية PWA لضمان العمل بدون إنترنت.</p>
-        <ul style="font-size: 0.9rem; line-height: 1.6;">
-            <li><b>الصوت:</b> إذا لم يعمل، تأكدي من تفعيل "صوت الوسائط" في هاتفك.</li>
-            <li><b>OCR:</b> التقطي صوراً في إضاءة جيدة لنتائج أفضل.</li>
-            <li><b>الحفظ:</b> يتم حفظ نصوصك محلياً في المتصفح.</li>
-        </ul>
+    <div id="ocr" class="section" style="display:none">
+        <div class="card">
+            <button class="btn btn-blue" style="width:100%; margin-bottom:10px" onclick="document.getElementById('file').click()">📷 تصوير أو اختيار صورة</button>
+            <input type="file" id="file" hidden accept="image/*" onchange="runOCR(this)">
+            <textarea id="txtOCR" placeholder="النص سيظهر هنا بعد التحليل..."></textarea>
+            <button class="btn btn-gray" style="width:100%" onclick="copyOCR()">📋 نسخ النص</button>
+        </div>
     </div>
 </div>
 
 <script>
-    // 1. حل مشكلة الصوت على أندرويد (AudioContext Unlock)
-    let audioContext;
-    function initAudio() {
-        if (!audioContext) {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        }
-    }
-
-    function playAudio(id) {
-        initAudio(); // فتح القفل عند أول نقرة
-        const text = document.getElementById(id).value;
-        if (!text) return;
-        
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'ar-SA';
-        utterance.rate = 0.9;
-        window.speechSynthesis.speak(utterance);
-    }
-
-    // 2. حل مشكلة OCR (المعاينة الفارغة والنتائج)
-    async function processOCR(input) {
-        if (!input.files[0]) return;
-        
-        const file = input.files[0];
-        const preview = document.getElementById('imgPreview');
-        const status = document.getElementById('status');
-        const pBar = document.getElementById('pBar');
-        const progress = document.getElementById('progress');
-
-        // إظهار المعاينة فوراً
-        preview.src = URL.createObjectURL(file);
-        preview.style.display = 'block';
-        
-        status.innerText = "⏳ جاري تحميل محرك النصوص...";
-        pBar.style.display = 'block';
-
-        try {
-            // استخدام نسخة Tesseract التي تدعم العمل الـ Offline
-            const worker = await Tesseract.createWorker({
-                logger: m => {
-                    if (m.status === 'recognizing text') {
-                        progress.style.width = (m.progress * 100) + '%';
-                        status.innerText = `جاري استخراج النص... ${Math.round(m.progress * 100)}%`;
-                    }
-                }
-            });
-
-            await worker.loadLanguage('ara+eng');
-            await worker.initialize('ara+eng');
-            const { data: { text } } = await worker.recognize(file);
-            
-            document.getElementById('txtOCR').value = text;
-            status.innerText = "✅ تم الاستخراج بنجاح";
-            await worker.terminate();
-        } catch (e) {
-            status.innerText = "❌ خطأ في المعالجة";
-            console.error(e);
-        } finally {
-            pBar.style.display = 'none';
-        }
-    }
-
-    // 3. الحفظ التلقائي (localStorage)
-    document.getElementById('txtMain').oninput = (e) => localStorage.setItem('saved_txt', e.target.value);
-    window.onload = () => {
-        if (localStorage.getItem('saved_txt')) document.getElementById('txtMain').value = localStorage.getItem('saved_txt');
-        
-        // تسجيل الـ Service Worker لضمان بقاء الأيقونة وتثبيت الـ PWA
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').then(() => console.log("PWA Ready"));
-        }
-    };
-
-    function switchTab(id, btn) {
-        document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+    // التنقل السلس
+    function sw(id, btn) {
+        document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         document.getElementById(id).style.display = 'block';
         btn.classList.add('active');
     }
 
-    function startDictation(id) {
+    // حل مشكلة الإملاء (Speech to Text)
+    function startSpeech() {
         const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!Speech) return alert("متصفحك لا يدعم الإملاء");
+        if (!Speech) return alert("المتصفح لا يدعم الإملاء");
+        
         const rec = new Speech();
         rec.lang = 'ar-SA';
-        rec.onstart = () => document.getElementById('status').innerText = "🎤 اسمعك.. تكلمي الآن";
+        rec.continuous = false;
+        
+        rec.onstart = () => document.getElementById('status').innerText = "🔴 جاري الاستماع.. تكلمي";
         rec.onresult = (e) => {
-            document.getElementById(id).value += e.results[0][0].transcript;
+            document.getElementById('txtMain').value += " " + e.results[0][0].transcript;
             document.getElementById('status').innerText = "✅ تمت الإضافة";
         };
+        rec.onerror = () => document.getElementById('status').innerText = "❌ لم أسمعك جيداً، جربي ثانية";
         rec.start();
     }
+
+    // الترجمة الفورية (بدون تعقيد)
+    async function translateText() {
+        const txt = document.getElementById('txtMain');
+        if(!txt.value) return;
+        document.getElementById('status').innerText = "⏳ جاري الترجمة...";
+        try {
+            const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=ar&dt=t&q=${encodeURIComponent(txt.value)}`);
+            const data = await res.json();
+            txt.value = data[0][0][0];
+            document.getElementById('status').innerText = "✅ تمت الترجمة";
+        } catch(e) { document.getElementById('status').innerText = "❌ خطأ في الاتصال"; }
+    }
+
+    // الحاسبة
+    let exp = "";
+    function c(v) {
+        const s = document.getElementById('screen');
+        if(v==='C') { exp = ""; s.innerText = "0"; }
+        else if(v==='=') { try { exp = eval(exp).toString(); s.innerText = exp; } catch { s.innerText = "خطأ"; exp = ""; } }
+        else { exp += v; s.innerText = exp; }
+    }
+
+    // استخراج النصوص (OCR) - نسخة خفيفة ومباشرة
+    async function runOCR(input) {
+        if(!input.files[0]) return;
+        const status = document.getElementById('status');
+        status.innerText = "⏳ جاري تحليل الصورة...";
+        try {
+            const { data: { text } } = await Tesseract.recognize(input.files[0], 'ara+eng');
+            document.getElementById('txtOCR').value = text;
+            status.innerText = "✅ تم الاستخراج";
+        } catch(e) { status.innerText = "❌ فشل التحليل"; }
+    }
+
+    function playText() {
+        window.speechSynthesis.cancel();
+        let m = new SpeechSynthesisUtterance(document.getElementById('txtMain').value);
+        m.lang = 'ar-SA';
+        window.speechSynthesis.speak(m);
+    }
+    function cls() { if(confirm("مسح؟")) document.getElementById('txtMain').value = ""; }
+    function copyOCR() { navigator.clipboard.writeText(document.getElementById('txtOCR').value); alert("تم النسخ"); }
 </script>
 </body>
 </html>
