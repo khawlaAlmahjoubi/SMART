@@ -3,15 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Smart Engine | م. خولة</title>
+    <title>المساعد الذكي المتكامل | م. خولة</title>
     
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
 
     <style>
-        :root { --p: #2563eb; --bg: #f8fafc; }
+        :root { --p: #2563eb; --bg: #f8fafc; --acc: #059669; --err: #dc2626; }
         body { font-family: system-ui, sans-serif; background: var(--bg); margin: 0; padding: 12px; }
         .card { max-width: 600px; margin: auto; background: white; border-radius: 20px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        
         .brand { text-align: center; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 2px solid #eee; }
         .brand h2 { color: var(--p); margin: 0; font-size: 1.2rem; }
 
@@ -19,24 +18,28 @@
         .st-work { display: block; background: #eff6ff; color: #1e40af; }
         .st-done { display: block; background: #dcfce7; color: #15803d; }
 
-        textarea { width: 100%; height: 350px; border: 2px solid #e2e8f0; border-radius: 15px; padding: 15px; font-size: 18px; line-height: 1.6; outline: none; box-sizing: border-box; resize: none; background: #fff; text-align: right; }
+        textarea { width: 100%; height: 350px; border: 2px solid #e2e8f0; border-radius: 15px; padding: 15px; font-size: 18px; line-height: 1.6; outline: none; box-sizing: border-box; resize: none; background: #fff; text-align: right; transition: 0.3s; }
         
         .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
         .btn { padding: 15px; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; color: white; font-size: 0.9rem; transition: 0.2s; }
         .bg-blue { background: var(--p); }
+        .bg-green { background: var(--acc); }
         .bg-black { background: #1e293b; }
         .btn:active { transform: scale(0.95); }
 
-        .toolbar { display: flex; gap: 8px; margin-bottom: 10px; justify-content: center; }
+        .toolbar { display: flex; gap: 8px; margin-bottom: 10px; justify-content: center; flex-wrap: wrap; }
         .t-btn { background: #f1f5f9; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.8rem; }
+        .mic-on { background: var(--err) !important; color: white !important; animation: pulse 1.5s infinite; }
+        
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
 
 <div class="card">
     <div class="brand">
-        <h2>المساعد الذكي</h2>
-        <small>النسخة المهنية | م. خولة المحجوبي</small>
+        <h2>المساعد الذكي المطور</h2>
+        <small>م. خولة المحجوبي - نسخة المساعدة الصوتية</small>
     </div>
 
     <div id="status"></div>
@@ -44,15 +47,17 @@
     <div class="toolbar">
         <button class="t-btn" onclick="zoom(2)">➕ تكبير</button>
         <button class="t-btn" onclick="zoom(-2)">➖ تصغير</button>
-        <button class="t-btn" onclick="copy()">📋 نسخ</button>
-        <button class="t-btn" onclick="speak()">🔊 قراءة</button>
+        <button id="micBtn" class="t-btn" onclick="toggleSpeech()">🎤 إملاء (صوت لنص)</button>
+        <button class="t-btn" style="background:#dcfce7; color:#15803d" onclick="cleanText()">✨ تنظيف وتنسيق</button>
     </div>
 
-    <textarea id="box" placeholder="اكتبي بالعربي للترجمة للإنجليزي، أو ارفعي صورة..."></textarea>
+    <textarea id="box" placeholder="تكلمي بالضغط على الميكروفون، أو ارفعي صورة، أو اكتبي..."></textarea>
 
     <div class="btn-grid">
         <button class="btn bg-blue" onclick="document.getElementById('fileIn').click()">📷 استخراج النص</button>
-        <button class="btn bg-blue" onclick="translateToEn()">🌐 ترجمة (عربي ← EN)</button>
+        <button class="btn bg-blue" onclick="translateToEn()">🌐 ترجمة (للعربية/EN)</button>
+        <button class="btn bg-green" onclick="speak()">🔊 قراءة النص</button>
+        <button class="btn bg-black" onclick="copy()">📋 نسخ</button>
         <button class="btn bg-black" onclick="printDoc()">📄 طباعة</button>
         <button class="btn bg-black" style="color:#ff8080" onclick="cls()">🗑️ مسح</button>
     </div>
@@ -63,6 +68,7 @@
 <script>
     const box = document.getElementById('box');
     const st = document.getElementById('status');
+    const micBtn = document.getElementById('micBtn');
 
     function showSt(txt, type='work') {
         st.innerText = txt;
@@ -71,12 +77,11 @@
         if(type === 'done') setTimeout(() => st.style.display = 'none', 3000);
     }
 
-    // 1. استخراج النص (OCR) مع تنظيف الذاكرة
+    // 1. استخراج النص من الصور
     async function runOCR(input) {
         if (!input.files[0]) return;
         showSt("⏳ جاري استخراج النص... يرجى الانتظار");
         box.value = "يتم التحليل...";
-
         try {
             const worker = await Tesseract.createWorker();
             await worker.loadLanguage('ara+eng');
@@ -84,67 +89,96 @@
             const { data: { text } } = await worker.recognize(input.files[0]);
             box.value = text.trim();
             showSt("✅ تم الاستخراج بنجاح", "done");
-            await worker.terminate(); // إنهاء المهمة فوراً لتوفير الذاكرة
+            await worker.terminate();
         } catch (e) { showSt("❌ خطأ في القراءة", "work"); }
     }
 
-    // 2. الترجمة من العربي إلى الإنجليزي (حصراً)
+    // 2. محرك تحويل الصوت إلى نص (Speech to Text)
+    let recognition;
+    function toggleSpeech() {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) return alert("المتصفح لا يدعم التعرف على الصوت");
+
+        if (!recognition) {
+            recognition = new SpeechRecognition();
+            recognition.lang = 'ar-SA';
+            recognition.continuous = true;
+            recognition.onstart = () => {
+                micBtn.classList.add('mic-on');
+                micBtn.innerText = "🛑 توقف";
+                showSt("🎤 أنا أسمعكِ الآن.. تحدثي", "work");
+            };
+            recognition.onresult = (e) => {
+                const transcript = e.results[e.results.length - 1][0].transcript;
+                box.value += " " + transcript;
+            };
+            recognition.onend = () => {
+                micBtn.classList.remove('mic-on');
+                micBtn.innerText = "🎤 إملاء (صوت لنص)";
+                showSt("✅ تم حفظ الإملاء", "done");
+                recognition = null;
+            };
+            recognition.start();
+        } else {
+            recognition.stop();
+        }
+    }
+
+    // 3. زر تنظيف وتنسيق النص
+    function cleanText() {
+        if(!box.value) return;
+        let text = box.value;
+        // إزالة المسافات المتكررة
+        text = text.replace(/[^\S\r\n]{2,}/g, ' ');
+        // إزالة الأسطر الفارغة الزائدة
+        text = text.replace(/\n\s*\n/g, '\n');
+        // مسح الفراغات من البداية والنهاية
+        box.value = text.trim();
+        showSt("✨ تم تنظيف وتنسيق النص", "done");
+    }
+
+    // 4. الترجمة الذكية
     async function translateToEn() {
-        if (!box.value || box.value.startsWith("يتم")) return;
-        showSt("⏳ جاري الترجمة للإنجليزية...");
-        
+        if (!box.value) return;
+        showSt("⏳ جاري الترجمة...");
         try {
-            // "tl=en" تعني الترجمة إلى الإنجليزية
-            const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=${encodeURIComponent(box.value)}`;
+            const lang = /[\u0600-\u06FF]/.test(box.value) ? 'en' : 'ar';
+            const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${lang}&dt=t&q=${encodeURIComponent(box.value)}`;
             const response = await fetch(url);
             const data = await response.json();
-            
             let result = "";
-            if (data && data[0]) {
-                data[0].forEach(part => { if (part[0]) result += part[0]; });
-            }
-
-            if (result) {
-                box.value = result;
-                box.style.textAlign = "left"; // تحويل النص لليسار لأنه إنجليزي
-                showSt("✅ تمت الترجمة بنجاح", "done");
-            }
+            data[0].forEach(part => { if (part[0]) result += part[0]; });
+            box.value = result;
+            box.style.textAlign = lang === 'en' ? 'left' : 'right';
+            showSt("✅ تمت الترجمة", "done");
         } catch (e) { showSt("❌ فشل الاتصال", "work"); }
     }
 
+    // وظائف إضافية
     function zoom(n) {
         let s = parseFloat(window.getComputedStyle(box).fontSize);
         box.style.fontSize = (s + n) + 'px';
     }
-
     function copy() {
         box.select();
         document.execCommand('copy');
         showSt("📋 تم النسخ", "done");
     }
-
     function speak() {
         window.speechSynthesis.cancel();
         const m = new SpeechSynthesisUtterance(box.value);
         m.lang = box.style.textAlign === "left" ? 'en-US' : 'ar-SA';
         window.speechSynthesis.speak(m);
     }
-
     function printDoc() {
         const w = window.open();
-        w.document.write(`<body dir="${box.style.textAlign === "left" ? 'ltr' : 'rtl'}" style="padding:30px;"><h2>Smart Engine</h2><hr><p style="font-size:20px;">${box.value}</p></body>`);
+        w.document.write(`<body dir="${box.style.textAlign === "left" ? 'ltr' : 'rtl'}" style="padding:30px;"><h2>م. خولة المحجوبي</h2><hr><p style="font-size:20px;">${box.value}</p></body>`);
         w.print();
     }
-
     function cls() { if(confirm("مسح؟")) { box.value = ""; box.style.textAlign = "right"; } }
 
-    // الحفظ التلقائي
-    setInterval(() => localStorage.setItem('kh_db_v7', box.value), 2000);
-    window.onload = () => {
-        box.value = localStorage.getItem('kh_db_v7') || "";
-        // إذا كان المحتوى إنجليزي (بدايته أحرف لاتينية) اجعل الاتجاه لليسار
-        if(/^[a-zA-Z]/.test(box.value)) box.style.textAlign = "left";
-    };
+    setInterval(() => localStorage.setItem('kh_db_final', box.value), 2000);
+    window.onload = () => box.value = localStorage.getItem('kh_db_final') || "";
 </script>
 
 </body>
