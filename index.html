@@ -9,163 +9,174 @@
 
     <style>
         :root { 
-            --primary: #4f46e5; --secondary: #10b981; --bg: #f8fafc; 
-            --card-bg: #ffffff; --text: #1e293b; 
+            --primary: #4338ca; --secondary: #059669; --bg: #f1f5f9; 
+            --card-bg: #ffffff; --text: #0f172a; --accent: #6366f1;
         }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 10px; transition: 0.3s; }
-        .app-container { max-width: 500px; margin: auto; background: var(--card-bg); border-radius: 2rem; padding: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        
+        body { 
+            font-family: 'Segoe UI', Tahoma, sans-serif; 
+            background: var(--bg); color: var(--text); 
+            margin: 0; padding: 10px; transition: 0.3s; 
+        }
+
+        .app-container { 
+            max-width: 550px; margin: auto; 
+            background: var(--card-bg); border-radius: 2rem; 
+            padding: 1.5rem; box-shadow: 0 15px 40px rgba(0,0,0,0.1); 
+        }
+
+        /* شريط التحديث العلوي */
+        .header-tools {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #eee;
+        }
+
+        .refresh-btn {
+            background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 10px;
+            padding: 8px 15px; cursor: pointer; font-weight: bold; font-size: 0.85rem;
+            color: var(--primary); display: flex; align-items: center; gap: 5px;
+        }
 
         /* التبويبات */
-        .tabs { display: flex; justify-content: space-around; margin-bottom: 15px; border-bottom: 2px solid #eee; }
-        .tab-btn { padding: 10px; cursor: pointer; border: none; background: none; color: var(--text); font-weight: bold; opacity: 0.6; font-size: 1rem; }
-        .tab-btn.active { opacity: 1; border-bottom: 3px solid var(--primary); color: var(--primary); }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
+        .tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+        .tab-btn { 
+            padding: 8px 15px; cursor: pointer; border: none; background: none; 
+            font-weight: bold; opacity: 0.4; font-size: 1rem; border-radius: 10px;
+        }
+        .tab-btn.active { opacity: 1; background: #eef2ff; color: var(--primary); }
 
-        /* الأزرار */
-        .grid-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        button { padding: 12px; border-radius: 12px; border: 1px solid #ddd; background: #fff; color: #333; cursor: pointer; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 5px; transition: 0.2s;}
-        button:active { transform: scale(0.95); }
+        /* التحكم في الخط */
+        .font-controls {
+            display: flex; justify-content: center; align-items: center;
+            gap: 12px; margin-bottom: 10px; background: #f8fafc;
+            padding: 6px; border-radius: 10px;
+        }
+        .font-btn { 
+            width: 32px; height: 32px; border-radius: 50%; border: 1px solid #ccc;
+            background: white; cursor: pointer; font-weight: bold;
+        }
+
+        /* الأزرار والمربعات */
+        .grid-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+        button { 
+            padding: 12px; border-radius: 14px; border: 1px solid #e2e8f0; 
+            background: #fff; cursor: pointer; font-weight: 600; font-size: 0.9rem;
+        }
         .btn-main { background: var(--primary); color: white; border: none; }
         .btn-success { background: var(--secondary); color: white; border: none; }
-        .btn-danger { background: #fee2e2; color: #dc2626; border: none; }
+        .btn-danger { background: #fff1f2; color: #e11d48; border: none; }
         
-        /* صناديق النصوص */
-        textarea { width: 100%; height: 200px; border-radius: 15px; border: 2px solid #eee; padding: 15px; font-size: 16px; resize: none; box-sizing: border-box; line-height: 1.6; transition: 0.3s; }
-        textarea:focus { border-color: var(--primary); outline: none; }
-        
-        /* الأدوات الهندسية */
-        .tool-box { background: var(--bg); padding: 15px; border-radius: 15px; margin-top: 10px; border: 1px solid #e2e8f0; }
-        input[type="text"], input[type="number"], select { width: 100%; padding: 10px; margin: 5px 0; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; font-size: 1rem;}
-        
-        /* الآلة الحاسبة */
-        .calc-display { width: 100%; padding: 15px; font-size: 1.5rem; text-align: left; background: #e2e8f0; border: none; border-radius: 10px; margin-bottom: 10px; color: #333; outline: none; }
-        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-        .calc-btn { padding: 15px; font-size: 1.2rem; border-radius: 10px; background: #fff; border: 1px solid #ddd; font-weight: bold; }
-        .calc-btn.op { background: var(--primary); color: white; border: none; }
-        .calc-btn.eq { background: var(--secondary); color: white; border: none; }
-        .calc-btn.clear { background: #ef4444; color: white; border: none; }
+        textarea { 
+            width: 100%; height: 200px; border-radius: 15px; 
+            border: 2px solid #f1f5f9; padding: 15px; font-size: 16px;
+            resize: none; box-sizing: border-box; background: #fafafa;
+        }
 
-        .status { font-size: 0.85rem; color: var(--primary); margin: 10px 0; text-align: center; font-weight: bold; min-height: 1.2em; }
-        
-        /* إعدادات الطباعة الاحترافية */
+        .calc-display { width: 100%; padding: 15px; font-size: 1.6rem; text-align: left; background: #f1f5f9; border-radius: 12px; margin-bottom: 10px; border: none; }
+        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .calc-btn { padding: 15px; font-size: 1.2rem; border-radius: 12px; border: 1px solid #eee; background: white; }
+
         @media print {
             body * { visibility: hidden; }
-            #printArea { 
-                visibility: visible; 
-                position: absolute; 
-                left: 0; top: 0; width: 100%; 
-                padding: 30px; 
-                direction: rtl; 
-                white-space: pre-wrap; 
-                font-size: 16pt; 
-                display: block !important;
-                color: black;
-            }
+            #printArea { visibility: visible; position: absolute; left: 0; top: 0; width: 100%; padding: 20px; display: block !important; }
         }
-        #printArea { display: none; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    <h3 style="text-align:center; color:var(--primary); margin-top: 0;">المساعد الهندسي SMART</h3>
-    
+    <div class="header-tools">
+        <span style="font-weight: bold; color: var(--primary);">SMART Assistant</span>
+        <button class="refresh-btn" onclick="location.reload()">🔄 تحديث التطبيق</button>
+    </div>
+
     <div class="tabs">
         <button class="tab-btn active" onclick="openTab('main', this)">الرئيسية</button>
         <button class="tab-btn" onclick="openTab('eng', this)">هندسي</button>
         <button class="tab-btn" onclick="openTab('adv', this)">متقدم</button>
     </div>
 
-    <div id="status" class="status">جاهز للعمل..</div>
+    <div id="status" style="text-align:center; font-size:0.8rem; margin-bottom:10px; color:var(--primary);">جاهز للعمل..</div>
 
-    <div id="main" class="tab-content active">
+    <div id="main" class="tab-content">
+        <div class="font-controls">
+            <span>حجم الخط:</span>
+            <button class="font-btn" onclick="changeFontSize('txtMain', -2)">-</button>
+            <button class="font-btn" onclick="changeFontSize('txtMain', 2)">+</button>
+        </div>
         <div class="grid-menu">
             <button class="btn-main" onclick="handleSpeak('txtMain')">🔊 قراءة</button>
-            <button class="btn-danger" onclick="window.speechSynthesis.cancel()">⏹️ إيقاف</button>
             <button class="btn-main" onclick="handleDictation('txtMain')">🎤 إملاء</button>
-            <button onclick="handleTranslate()">🌐 ترجمة (EN)</button>
+            <button onclick="handleTranslate()">🌐 ترجمة</button>
+            <button class="btn-danger" onclick="clearText('txtMain')">🗑️ مسح</button>
         </div>
-        <textarea id="txtMain" placeholder="اكتب ملاحظاتك الهندسية هنا..."></textarea>
+        <textarea id="txtMain" placeholder="اكتبي هنا..."></textarea>
     </div>
 
-    <div id="eng" class="tab-content">
-        <div class="tool-box">
-            <input type="text" id="calcDisplay" class="calc-display" readonly placeholder="0">
-            <div class="calc-grid">
-                <button class="calc-btn clear" onclick="calcAction('C')">C</button>
-                <button class="calc-btn op" onclick="calcAction('(')">(</button>
-                <button class="calc-btn op" onclick="calcAction(')')">)</button>
-                <button class="calc-btn op" onclick="calcAction('/')">÷</button>
-                
-                <button class="calc-btn" onclick="calcAction('7')">7</button>
-                <button class="calc-btn" onclick="calcAction('8')">8</button>
-                <button class="calc-btn" onclick="calcAction('9')">9</button>
-                <button class="calc-btn op" onclick="calcAction('*')">×</button>
-                
-                <button class="calc-btn" onclick="calcAction('4')">4</button>
-                <button class="calc-btn" onclick="calcAction('5')">5</button>
-                <button class="calc-btn" onclick="calcAction('6')">6</button>
-                <button class="calc-btn op" onclick="calcAction('-')">-</button>
-                
-                <button class="calc-btn" onclick="calcAction('1')">1</button>
-                <button class="calc-btn" onclick="calcAction('2')">2</button>
-                <button class="calc-btn" onclick="calcAction('3')">3</button>
-                <button class="calc-btn op" onclick="calcAction('+')">+</button>
-                
-                <button class="calc-btn" onclick="calcAction('0')">0</button>
-                <button class="calc-btn" onclick="calcAction('.')">.</button>
-                <button class="calc-btn eq" onclick="calcAction('=')" style="grid-column: span 2;">=</button>
-            </div>
-        </div>
-
-        <div class="tool-box" style="margin-top:15px;">
-            <label style="font-weight:bold; display:block; margin-bottom:5px;">📏 محول الوحدات:</label>
-            <input type="number" id="unitVal" value="1" oninput="convertUnits()">
-            <select id="unitType" onchange="convertUnits()">
-                <option value="m-cm">متر إلى سنتيمتر</option>
-                <option value="cm-m">سنتيمتر إلى متر</option>
-                <option value="kg-g">كيلوجرام إلى جرام</option>
-                <option value="in-cm">بوصة إلى سنتيمتر</option>
-            </select>
-            <div id="unitResult" style="font-weight:bold; color:var(--primary); margin-top:10px;">النتيجة: 100 سم</div>
+    <div id="eng" class="tab-content" style="display:none;">
+        <input type="text" id="calcDisplay" class="calc-display" readonly placeholder="0">
+        <div class="calc-grid">
+            <button class="calc-btn" style="color:red" onclick="calcAction('C')">C</button>
+            <button class="calc-btn" onclick="calcAction('(')">(</button>
+            <button class="calc-btn" onclick="calcAction(')')">)</button>
+            <button class="calc-btn" onclick="calcAction('/')">÷</button>
+            <button class="calc-btn" onclick="calcAction('7')">7</button>
+            <button class="calc-btn" onclick="calcAction('8')">8</button>
+            <button class="calc-btn" onclick="calcAction('9')">9</button>
+            <button class="calc-btn" onclick="calcAction('*')">×</button>
+            <button class="calc-btn" onclick="calcAction('4')">4</button>
+            <button class="calc-btn" onclick="calcAction('5')">5</button>
+            <button class="calc-btn" onclick="calcAction('6')">6</button>
+            <button class="calc-btn" onclick="calcAction('-')">-</button>
+            <button class="calc-btn" onclick="calcAction('1')">1</button>
+            <button class="calc-btn" onclick="calcAction('2')">2</button>
+            <button class="calc-btn" onclick="calcAction('3')">3</button>
+            <button class="calc-btn" onclick="calcAction('+')">+</button>
+            <button class="calc-btn" onclick="calcAction('0')">0</button>
+            <button class="calc-btn" onclick="calcAction('.')">.</button>
+            <button class="calc-btn btn-success" style="grid-column: span 2;" onclick="calcAction('=')">=</button>
         </div>
     </div>
 
-    <div id="adv" class="tab-content">
+    <div id="adv" class="tab-content" style="display:none;">
         <div class="grid-menu">
-            <button class="btn-main" onclick="document.getElementById('imgInput').click()" style="grid-column: span 2; padding: 15px;">📷 استخراج نص من صورة</button>
-            <button class="btn-success" onclick="cleanExtractedText()">🧹 تنظيف النص</button>
-            <button onclick="copyToClipboard('txtAdv')">📋 نسخ</button>
-            <button class="btn-main" onclick="printText('txtAdv')" style="grid-column: span 2; background: #1e293b;">📄 حفظ كـ PDF (النص المعدل)</button>
-            <button class="btn-danger" onclick="clearText('txtAdv')" style="grid-column: span 2;">🗑️ مسح المربع</button>
+            <button class="btn-main" onclick="document.getElementById('imgInput').click()" style="grid-column: span 2;">📷 نص من صورة</button>
+            <button class="btn-success" onclick="cleanText()">🧹 تنظيف</button>
+            <button onclick="copyToClipboard()">📋 نسخ</button>
+            <button class="btn-main" onclick="printText()" style="grid-column: span 2; background:#000;">📄 طباعة PDF</button>
         </div>
-        
         <input type="file" id="imgInput" hidden accept="image/*" onchange="extractText(this)">
-        
-        <label style="font-size: 0.85rem; font-weight: bold; color: var(--primary);">📝 المعاينة والتعديل اليدوي:</label>
-        <textarea id="txtAdv" style="height: 250px;" placeholder="سيظهر النص المستخرج هنا.. يمكنك حذفه أو الإضافة عليه بحرية قبل الطباعة."></textarea>
+        <textarea id="txtAdv" style="height: 250px;" placeholder="المعاينة والتعديل..."></textarea>
     </div>
 
-    <div style="text-align:center; margin-top:20px; font-size:0.8rem; opacity:0.7">
-        إعداد المهندسة خولة المحجوبي ©
-    </div>
+    <p style="text-align:center; font-size:0.7rem; opacity:0.6; margin-top:15px;">إعداد المهندسة خولة المحجوبي ©</p>
 </div>
 
 <div id="printArea"></div>
 
 <script>
-    // التنقل بين التبويبات
     function openTab(tabName, btn) {
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(tabName).classList.add('active');
+        document.getElementById(tabName).style.display = 'block';
         btn.classList.add('active');
     }
 
-    function setStatus(msg) { document.getElementById('status').innerText = msg; }
+    function changeFontSize(id, step) {
+        const el = document.getElementById(id);
+        const currentSize = parseFloat(window.getComputedStyle(el).fontSize);
+        el.style.fontSize = (currentSize + step) + 'px';
+    }
 
-    // --- وظائف القسم الأول والثاني ---
+    function extractText(input) {
+        if(!input.files[0]) return;
+        document.getElementById('status').innerText = "⏳ جاري التحليل...";
+        Tesseract.recognize(input.files[0], 'ara+eng').then(({ data: { text } }) => {
+            document.getElementById('txtAdv').value = text;
+            document.getElementById('status').innerText = "✅ تم الاستخراج";
+        });
+    }
+
     function calcAction(val) {
         const d = document.getElementById('calcDisplay');
         if (val === 'C') d.value = '';
@@ -173,98 +184,39 @@
         else d.value += val;
     }
 
-    function convertUnits() {
-        const val = parseFloat(document.getElementById('unitVal').value) || 0;
-        const type = document.getElementById('unitType').value;
-        let res = "";
-        if(type === "m-cm") res = (val * 100) + " سم";
-        else if(type === "cm-m") res = (val / 100) + " متر";
-        else if(type === "kg-g") res = (val * 1000) + " جرام";
-        else if(type === "in-cm") res = (val * 2.54).toFixed(2) + " سم";
-        document.getElementById('unitResult').innerText = "النتيجة: " + res;
+    function printText() {
+        document.getElementById('printArea').innerText = document.getElementById('txtAdv').value;
+        window.print();
+    }
+
+    function cleanText() {
+        let a = document.getElementById('txtAdv');
+        a.value = a.value.replace(/[`~|\\_/*^]/g, '').trim();
+    }
+
+    function copyToClipboard() { navigator.clipboard.writeText(document.getElementById('txtAdv').value); }
+    function clearText(id) { document.getElementById(id).value = ""; }
+
+    function handleSpeak(id) {
+        window.speechSynthesis.cancel();
+        let s = new SpeechSynthesisUtterance(document.getElementById(id).value);
+        s.lang = 'ar-SA';
+        window.speechSynthesis.speak(s);
+    }
+
+    function handleDictation(id) {
+        const rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        rec.lang = 'ar-SA';
+        rec.onresult = (e) => { document.getElementById(id).value += e.results[0][0].transcript; };
+        rec.start();
     }
 
     async function handleTranslate() {
         const txt = document.getElementById('txtMain');
-        if (!txt.value.trim()) return;
-        setStatus("⏳ جاري الترجمة...");
-        try {
-            const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=ar&tl=en&dt=t&q=${encodeURIComponent(txt.value)}`;
-            const res = await fetch(url);
-            const data = await res.json();
-            txt.value = data[0][0][0];
-            setStatus("✅ تمت الترجمة");
-        } catch { setStatus("❌ فشل الاتصال"); }
-    }
-
-    // --- وظائف القسم المتقدم (المختبر) ---
-    function extractText(input) {
-        if(!input.files[0]) return;
-        setStatus("⏳ جاري تحليل الصورة... يرجى الانتظار");
-        Tesseract.recognize(input.files[0], 'ara+eng').then(({ data: { text } }) => {
-            document.getElementById('txtAdv').value = text;
-            setStatus("✅ تم الاستخراج. يمكنك التعديل الآن.");
-        }).catch(() => setStatus("❌ خطأ في القراءة"));
-    }
-
-    function cleanExtractedText() {
-        let area = document.getElementById('txtAdv');
-        if(!area.value) return;
-        // حذف الرموز الغريبة والأسطر الفارغة الزائدة
-        area.value = area.value
-            .replace(/[`~|\\_/*^]/g, '') 
-            .replace(/\n\s*\n/g, '\n')
-            .trim();
-        setStatus("🧹 تم تنظيف النص");
-    }
-
-    function printText(areaId) {
-        let text = document.getElementById(areaId).value;
-        if(!text.trim()) { setStatus("⚠️ المربع فارغ!"); return; }
-        
-        // تحديث منطقة الطباعة بآخر نسخة معدلة من النص
-        document.getElementById('printArea').innerText = text;
-        setStatus("📄 جاري تجهيز الطباعة...");
-        
-        setTimeout(() => {
-            window.print();
-            setStatus("✅ تم إرسال الأمر");
-        }, 300);
-    }
-
-    function copyToClipboard(id) {
-        navigator.clipboard.writeText(document.getElementById(id).value);
-        setStatus("📋 تم النسخ");
-    }
-
-    function clearText(id) {
-        if(confirm("هل تريد إفراغ المربع؟")) {
-            document.getElementById(id).value = "";
-            setStatus("🗑️ تم المسح");
-        }
-    }
-
-    function handleSpeak(id) {
-        let text = document.getElementById(id).value;
-        if(!text) return;
-        window.speechSynthesis.cancel();
-        let s = new SpeechSynthesisUtterance(text);
-        s.lang = 'ar-SA';
-        window.speechSynthesis.speak(s);
-        setStatus("🔊 جاري القراءة...");
-    }
-
-    function handleDictation(id) {
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if(!SpeechRecognition) { setStatus("❌ متصفحك لا يدعم الإملاء"); return; }
-        const rec = new SpeechRecognition();
-        rec.lang = 'ar-SA';
-        rec.onstart = () => setStatus("🎤 اسمعك.. تحدثي الآن");
-        rec.onresult = (e) => { 
-            document.getElementById(id).value += " " + e.results[0][0].transcript; 
-            setStatus("✅ تمت الكتابة");
-        };
-        rec.start();
+        const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=ar&tl=en&dt=t&q=${encodeURIComponent(txt.value)}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        txt.value = data[0][0][0];
     }
 </script>
 </body>
