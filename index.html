@@ -3,188 +3,194 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Smart Assistant | م. خولة</title>
+    <title>المساعد الشامل | م. خولة المحجوبي</title>
     
-    <script src="https://unpkg.com/tesseract.js@v2.1.0/dist/tesseract.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
 
     <style>
-        :root { --main: #2563eb; --accent: #dc2626; --bg: #f8fafc; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; padding: 12px; color: #1e293b; }
+        :root { --p: #2563eb; --s: #f8fafc; --acc: #059669; --err: #e11d48; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f0f2f5; margin: 0; padding: 10px; color: #1e293b; padding-bottom: 30px; }
+        .app-card { max-width: 600px; margin: auto; background: white; border-radius: 25px; padding: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border: 1px solid #e5e7eb; }
         
-        /* ترويسة احترافية */
-        .brand { text-align: center; background: white; padding: 15px; border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 12px; border-bottom: 4px solid var(--main); }
-        .brand h2 { margin: 0; font-size: 1.2rem; color: var(--main); }
-        
-        /* منطقة العمل */
-        .card { background: white; border-radius: 25px; padding: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); position: relative; }
-        
-        .toolbar { display: flex; gap: 8px; margin-bottom: 10px; overflow-x: auto; padding: 5px 0; }
-        .t-btn { background: #f1f5f9; border: none; padding: 10px 15px; border-radius: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; font-size: 0.85rem; color: #475569; transition: 0.2s; }
-        .t-btn:active { background: #e2e8f0; transform: scale(0.95); }
-        .mic-active { background: var(--accent) !important; color: white !important; animation: pulse 1.5s infinite; }
+        .brand { text-align: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 15px; margin-bottom: 15px; }
+        .brand h2 { margin: 0; color: var(--p); font-size: 1.3rem; }
+        .brand span { font-size: 0.8rem; color: #64748b; font-weight: bold; }
 
-        textarea { width: 100%; height: 320px; border: 2px solid #f1f5f9; border-radius: 18px; padding: 15px; font-size: 18px; outline: none; transition: 0.3s; resize: none; box-sizing: border-box; line-height: 1.6; }
-        textarea:focus { border-color: var(--main); background: #fff; }
+        /* منطقة النص */
+        .text-container { position: relative; }
+        textarea { width: 100%; height: 350px; border: 2px solid #e5e7eb; border-radius: 20px; padding: 15px; font-size: 18px; line-height: 1.6; outline: none; transition: 0.3s; resize: none; box-sizing: border-box; background: #fff; }
+        textarea:focus { border-color: var(--p); background: #fdfdfd; }
 
-        /* الأزرار الكبيرة */
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-        .action { padding: 15px; border-radius: 15px; border: none; font-weight: 800; cursor: pointer; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .btn-blue { background: var(--main); color: white; box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
-        .btn-gray { background: #f1f5f9; color: #1e293b; }
+        /* شريط الأدوات العلوي */
+        .toolbar { display: flex; gap: 8px; margin-bottom: 10px; justify-content: center; flex-wrap: wrap; }
+        .t-btn { background: #f1f5f9; border: none; padding: 8px 12px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 0.85rem; color: #475569; }
+        .mic-active { background: var(--err) !important; color: white !important; animation: pulse 1.5s infinite; }
 
-        /* شريط الحالة العائم */
-        #status { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 2000; padding: 12px 25px; border-radius: 50px; font-weight: bold; font-size: 0.9rem; display: none; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-        .loading { display: block !important; background: var(--main); color: white; }
-        .success { display: block !important; background: #22c55e; color: white; }
+        /* شبكة الأزرار الرئيسية */
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .main-btn { padding: 15px; border-radius: 15px; border: none; font-weight: 800; cursor: pointer; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 8px; color: white; transition: 0.2s; text-decoration: none; }
+        .bg-blue { background: var(--p); box-shadow: 0 4px 12px rgba(37,99,235,0.2); }
+        .bg-green { background: var(--acc); box-shadow: 0 4px 12px rgba(5,150,105,0.2); }
+        .bg-gray { background: #64748b; }
+        .main-btn:active { transform: scale(0.97); }
+
+        /* التنبيهات */
+        #status-msg { font-size: 0.85rem; text-align: center; font-weight: bold; margin-bottom: 10px; padding: 10px; border-radius: 12px; display: none; }
+        .info { display: block !important; background: #eff6ff; color: #1e40af; }
+        .done { display: block !important; background: #dcfce7; color: #15803d; }
 
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
 
-<div id="status"></div>
+<div class="app-card">
+    <div class="brand">
+        <h2>المنصة الذكية المتكاملة</h2>
+        <span>إشراف م. خولة المحجوبي</span>
+    </div>
 
-<div class="brand">
-    <h2>Smart Assistant</h2>
-    <small style="font-weight: bold; color: #64748b;">النسخة السريعة | المهندسة خولة المحجوبي</small>
-</div>
+    <div id="status-msg"></div>
 
-<div class="card">
     <div class="toolbar">
         <button class="t-btn" onclick="zoom(2)">➕ تكبير</button>
         <button class="t-btn" onclick="zoom(-2)">➖ تصغير</button>
-        <button id="micBtn" class="t-btn" onclick="toggleMic()">🎤 إملاء صوتي</button>
-        <button class="t-btn" onclick="speak()">🔊 قراءة</button>
+        <button id="micBtn" class="t-btn" onclick="toggleVoice()">🎤 إملاء صوتي</button>
+        <button class="t-btn" onclick="copyText()">📋 نسخ</button>
+        <button class="t-btn" onclick="speakText()">🔊 قراءة</button>
     </div>
 
-    <textarea id="mainTxt" placeholder="ابدئي الكتابة أو استخدمي الأدوات بالأسفل..."></textarea>
-
-    <div class="grid">
-        <button class="action btn-blue" onclick="document.getElementById('file').click()">📷 استخراج سريع</button>
-        <button class="action btn-blue" onclick="translateNow()">🌐 ترجمة فورية</button>
-        <button class="action btn-gray" onclick="copy()">📋 نسخ</button>
-        <button class="action btn-gray" onclick="printTxt()">📄 طباعة</button>
+    <div class="text-container">
+        <textarea id="mainBox" placeholder="اكتبي هنا، أو استخدمي الميكروفون، أو ارفعي صورة للاستخراج..."></textarea>
     </div>
-    <input type="file" id="file" hidden accept="image/*" onchange="fastOCR(this)">
+
+    <div class="btn-grid">
+        <button class="main-btn bg-blue" onclick="document.getElementById('fileIn').click()">📷 استخراج من صورة</button>
+        
+        <button class="main-btn bg-blue" onclick="smartTranslate()">🌐 ترجمة فورية</button>
+        
+        <button class="main-btn bg-gray" onclick="printDocument()">📄 طباعة التقرير</button>
+        
+        <button class="main-btn bg-gray" style="color:#ff4d4d" onclick="clearData()">🗑️ مسح المذكرة</button>
+    </div>
+    
+    <input type="file" id="fileIn" hidden accept="image/*" onchange="extractOCR(this)">
 </div>
 
-<button class="action btn-gray" style="width:100%; margin-top:15px; color:red; background:white;" onclick="cls()">🗑️ مسح المذكرة</button>
-
 <script>
-    const area = document.getElementById('mainTxt');
-    const st = document.getElementById('status');
+    const box = document.getElementById('mainBox');
+    const msg = document.getElementById('status-msg');
 
-    // 1. استخراج النص (أسرع طريقة ممكنة)
-    async function fastOCR(input) {
+    function notify(text, type='info') {
+        msg.innerText = text;
+        msg.className = type === 'info' ? 'info' : 'done';
+        setTimeout(() => msg.className = '', 3500);
+    }
+
+    // 1. خدمة استخراج النص (OCR)
+    async function extractOCR(input) {
         if (!input.files[0]) return;
-        showStatus("⏳ جاري استخراج النص بسرعة...", "loading");
-        
+        notify("⏳ جاري استخراج النص من الصورة...");
+        box.value = "يتم التحليل... يرجى الانتظار";
+
         try {
-            const worker = Tesseract.createWorker();
-            await worker.load();
+            const worker = await Tesseract.createWorker();
             await worker.loadLanguage('ara+eng');
             await worker.initialize('ara+eng');
             const { data: { text } } = await worker.recognize(input.files[0]);
-            
-            if (text.trim()) {
-                area.value += "\n" + text;
-                showStatus("✅ تم الاستخراج بنجاح", "success");
-            } else {
-                showStatus("⚠️ لم أجد نصاً واضحاً", "");
-            }
+            box.value = text.trim() || "لم أجد نصاً واضحاً في الصورة.";
+            notify("✅ تم الاستخراج بنجاح", "done");
             await worker.terminate();
         } catch (e) {
-            showStatus("❌ فشل المحرك.. جربي صورة أوضح", "");
+            notify("❌ خطأ في معالجة الصورة", "info");
         }
     }
 
-    // 2. الترجمة الفورية (حل مشكلة عدم العمل)
-    async function translateNow() {
-        if (!area.value) return;
-        showStatus("⏳ جاري الترجمة للعربية...", "loading");
+    // 2. خدمة الترجمة الاحترافية (تقسيم النصوص الطويلة)
+    async function smartTranslate() {
+        if (!box.value) return;
+        notify("⏳ جاري الترجمة الاحترافية...");
         
         try {
-            // استخدام رابط جوجل المباشر مع معالجة الأجزاء الطويلة
-            const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=ar&dt=t&q=${encodeURIComponent(area.value)}`;
-            const response = await fetch(url);
-            const result = await response.json();
-            
-            let translated = "";
-            result[0].forEach(part => { if (part[0]) translated += part[0]; });
-            
-            area.value = translated;
-            showStatus("✅ تمت الترجمة", "success");
+            const chunks = box.value.match(/[\s\S]{1,1500}/g) || [box.value];
+            let translatedParts = [];
+
+            for (let chunk of chunks) {
+                const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=ar&dt=t&q=${encodeURIComponent(chunk)}`);
+                const data = await res.json();
+                translatedParts.push(data[0].map(x => x[0]).join(''));
+            }
+
+            box.value = translatedParts.join(' ');
+            notify("✅ تمت الترجمة بالكامل", "done");
         } catch (e) {
-            showStatus("❌ فشل الاتصال.. تأكدي من الإنترنت", "");
+            notify("❌ فشل الاتصال بالترجمة", "info");
         }
     }
 
-    // 3. الإملاء الصوتي
-    let recognition;
-    function toggleMic() {
+    // 3. خدمة الإملاء الصوتي (Voice to Text)
+    let rec;
+    function toggleVoice() {
         const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!Speech) return alert("المتصفح لا يدعم الصوت");
+        if (!Speech) return alert("متصفحك لا يدعم الإملاء الصوتي");
 
-        if (!recognition) {
-            recognition = new Speech();
-            recognition.lang = 'ar-SA';
-            recognition.continuous = true;
-            recognition.onstart = () => {
+        if (!rec) {
+            rec = new Speech();
+            rec.lang = 'ar-SA';
+            rec.continuous = true;
+            rec.onstart = () => {
                 document.getElementById('micBtn').classList.add('mic-active');
-                showStatus("🎤 أنا أسمعكِ.. تحدثي", "loading");
+                notify("🎤 أنا أسمعكِ الآن.. تحدثي");
             };
-            recognition.onresult = (e) => {
-                area.value += " " + e.results[e.results.length - 1][0].transcript;
+            rec.onresult = (e) => {
+                box.value += " " + e.results[e.results.length - 1][0].transcript;
             };
-            recognition.onend = () => {
+            rec.onend = () => {
                 document.getElementById('micBtn').classList.remove('mic-active');
-                showStatus("✅ تم حفظ الصوت", "success");
-                recognition = null;
+                rec = null;
             };
-            recognition.start();
+            rec.start();
         } else {
-            recognition.stop();
+            rec.stop();
         }
     }
 
-    // 4. أدوات المساعدة (تكبير/قراءة/طباعة)
+    // 4. خدمات إضافية (تكبير، قراءة، نسخ، طباعة)
     function zoom(n) {
-        let size = parseFloat(window.getComputedStyle(area).fontSize);
-        area.style.fontSize = (size + n) + 'px';
+        let s = parseFloat(window.getComputedStyle(box).fontSize);
+        box.style.fontSize = (s + n) + 'px';
     }
 
-    function speak() {
-        if (!area.value) return;
-        window.speechSynthesis.cancel();
-        const msg = new SpeechSynthesisUtterance(area.value);
-        msg.lang = 'ar-SA';
-        window.speechSynthesis.speak(msg);
-    }
-
-    function showStatus(text, type) {
-        st.innerText = text;
-        st.className = type;
-        st.style.display = "block";
-        setTimeout(() => st.style.display = "none", 3000);
-    }
-
-    function copy() {
-        area.select();
+    function copyText() {
+        box.select();
         document.execCommand('copy');
-        showStatus("📋 تم النسخ", "success");
+        notify("📋 تم نسخ النص للذاكرة", "done");
     }
 
-    function printTxt() {
+    function speakText() {
+        if(!box.value) return;
+        window.speechSynthesis.cancel();
+        const m = new SpeechSynthesisUtterance(box.value);
+        m.lang = 'ar-SA';
+        window.speechSynthesis.speak(m);
+    }
+
+    function printDocument() {
         const w = window.open('', '_blank');
-        w.document.write(`<html dir="rtl"><body style="padding:40px; font-family:sans-serif;"><h2>Smart Assistant - م. خولة</h2><hr><p style="white-space:pre-wrap; font-size:22px;">${area.value}</p><script>window.print();<\/script></body></html>`);
+        w.document.write(`<html dir="rtl"><body style="padding:40px; font-family:sans-serif;"><h2>تقرير: م. خولة المحجوبي</h2><hr><p style="white-space:pre-wrap; font-size:20px;">${box.value}</p><script>window.print();<\/script></body></html>`);
         w.document.close();
     }
 
-    function cls() { if (confirm("هل تريدين مسح كل شيء؟")) area.value = ""; }
+    function clearData() {
+        if(confirm("هل تريدين مسح كل البيانات؟")) {
+            box.value = "";
+            localStorage.removeItem('kh_all_data');
+        }
+    }
 
-    // الحفظ التلقائي
-    setInterval(() => localStorage.setItem('kh_db', area.value), 2000);
-    window.onload = () => area.value = localStorage.getItem('kh_db') || "";
+    // حفظ تلقائي فوري لضمان عدم ضياع العمل
+    setInterval(() => localStorage.setItem('kh_all_data', box.value), 2000);
+    window.onload = () => box.value = localStorage.getItem('kh_all_data') || "";
 </script>
 
 </body>
