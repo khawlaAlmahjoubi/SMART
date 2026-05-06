@@ -1,7 +1,7 @@
 {
   "name": "LMS صوتي",
   "short_name": "LMS",
-  "start_url": "lms-d-lrqmy-lshml.html",
+  "start_url": "/SMART/index.html",
   "display": "standalone",
   "background_color": "#f8fafc",
   "theme_color": "#4f46e5",

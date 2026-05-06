@@ -2,9 +2,9 @@ self.addEventListener('install', e => {
   e.waitUntil(
     caches.open('lms-v1').then(cache => {
       return cache.addAll([
-        'lms-d-lrqmy-lshml.html',
+        'index.html',        // غيرنا الاسم هنا
         'manifest.json',
-        'icon-192.png'
+        'icon-192.png'       // تأكدي من وجود صورة بهذا الاسم في حسابك
       ]);
     })
   );
