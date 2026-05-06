@@ -3,42 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>المحرك المتكامل | م. خولة</title>
+    <title>Smart Engine | م. خولة</title>
     
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
 
     <style>
         :root { --p: #2563eb; --bg: #f8fafc; }
-        body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 12px; }
+        body { font-family: system-ui, sans-serif; background: var(--bg); margin: 0; padding: 12px; }
         .card { max-width: 600px; margin: auto; background: white; border-radius: 20px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        .brand { text-align: center; margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        
+        .brand { text-align: center; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 2px solid #eee; }
         .brand h2 { color: var(--p); margin: 0; font-size: 1.2rem; }
-        
-        textarea { width: 100%; height: 380px; border: 2px solid #e2e8f0; border-radius: 15px; padding: 15px; font-size: 18px; line-height: 1.6; outline: none; box-sizing: border-box; resize: none; background: #fff; }
-        
-        .status { font-size: 0.85rem; text-align: center; padding: 10px; margin-bottom: 10px; border-radius: 10px; display: none; font-weight: bold; }
-        .st-loading { display: block; background: #dbeafe; color: #1e40af; }
-        .st-success { display: block; background: #dcfce7; color: #15803d; }
 
-        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 15px; }
-        .btn { padding: 14px; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; color: white; font-size: 0.9rem; transition: 0.2s; }
-        .bg-blue { background: var(--p); }
-        .bg-gray { background: #64748b; }
-        .btn:active { transform: scale(0.96); }
+        #status { font-size: 0.85rem; text-align: center; padding: 10px; margin-bottom: 10px; border-radius: 10px; display: none; font-weight: bold; }
+        .st-work { display: block; background: #eff6ff; color: #1e40af; }
+        .st-done { display: block; background: #dcfce7; color: #15803d; }
+
+        textarea { width: 100%; height: 350px; border: 2px solid #e2e8f0; border-radius: 15px; padding: 15px; font-size: 18px; line-height: 1.6; outline: none; box-sizing: border-box; resize: none; background: #fff; text-align: right; }
         
-        .toolbar { display: flex; gap: 5px; margin-bottom: 10px; justify-content: center; }
-        .t-btn { background: #f1f5f9; border: none; padding: 8px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: bold; }
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .btn { padding: 15px; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; color: white; font-size: 0.9rem; transition: 0.2s; }
+        .bg-blue { background: var(--p); }
+        .bg-black { background: #1e293b; }
+        .btn:active { transform: scale(0.95); }
+
+        .toolbar { display: flex; gap: 8px; margin-bottom: 10px; justify-content: center; }
+        .t-btn { background: #f1f5f9; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.8rem; }
     </style>
 </head>
 <body>
 
 <div class="card">
     <div class="brand">
-        <h2>Smart Assistant</h2>
-        <small style="color:#666; font-weight:bold">م. خولة المحجوبي</small>
+        <h2>المساعد الذكي</h2>
+        <small>النسخة المهنية | م. خولة المحجوبي</small>
     </div>
 
-    <div id="msg" class="status"></div>
+    <div id="status"></div>
 
     <div class="toolbar">
         <button class="t-btn" onclick="zoom(2)">➕ تكبير</button>
@@ -47,33 +48,34 @@
         <button class="t-btn" onclick="speak()">🔊 قراءة</button>
     </div>
 
-    <textarea id="box" placeholder="ابدئي هنا..."></textarea>
+    <textarea id="box" placeholder="اكتبي بالعربي للترجمة للإنجليزي، أو ارفعي صورة..."></textarea>
 
     <div class="btn-grid">
-        <button class="btn bg-blue" onclick="document.getElementById('imgIn').click()">📷 استخراج من صورة</button>
-        <button class="btn bg-blue" onclick="megaTranslate()">🌐 ترجمة فورية</button>
-        <button class="btn bg-gray" onclick="printDoc()">📄 طباعة</button>
-        <button class="btn bg-gray" style="color:#ffb3b3" onclick="cls()">🗑️ مسح</button>
+        <button class="btn bg-blue" onclick="document.getElementById('fileIn').click()">📷 استخراج النص</button>
+        <button class="btn bg-blue" onclick="translateToEn()">🌐 ترجمة (عربي ← EN)</button>
+        <button class="btn bg-black" onclick="printDoc()">📄 طباعة</button>
+        <button class="btn bg-black" style="color:#ff8080" onclick="cls()">🗑️ مسح</button>
     </div>
     
-    <input type="file" id="imgIn" hidden accept="image/*" onchange="runOCR(this)">
+    <input type="file" id="fileIn" hidden accept="image/*" onchange="runOCR(this)">
 </div>
 
 <script>
     const box = document.getElementById('box');
-    const msg = document.getElementById('msg');
+    const st = document.getElementById('status');
 
-    function showMsg(text, type='loading') {
-        msg.innerText = text;
-        msg.className = 'status st-' + type;
-        setTimeout(() => msg.className = 'status', 4000);
+    function showSt(txt, type='work') {
+        st.innerText = txt;
+        st.className = 'st-' + type;
+        st.style.display = 'block';
+        if(type === 'done') setTimeout(() => st.style.display = 'none', 3000);
     }
 
-    // 1. استخراج النص (OCR)
+    // 1. استخراج النص (OCR) مع تنظيف الذاكرة
     async function runOCR(input) {
         if (!input.files[0]) return;
-        showMsg("⏳ جاري تحليل الصورة واستخراج النص...");
-        box.value = "يتم الاستخراج الآن...";
+        showSt("⏳ جاري استخراج النص... يرجى الانتظار");
+        box.value = "يتم التحليل...";
 
         try {
             const worker = await Tesseract.createWorker();
@@ -81,45 +83,33 @@
             await worker.initialize('ara+eng');
             const { data: { text } } = await worker.recognize(input.files[0]);
             box.value = text.trim();
-            showMsg("✅ تم الاستخراج", "success");
-            await worker.terminate();
-        } catch (e) { showMsg("❌ خطأ في القراءة", "loading"); }
+            showSt("✅ تم الاستخراج بنجاح", "done");
+            await worker.terminate(); // إنهاء المهمة فوراً لتوفير الذاكرة
+        } catch (e) { showSt("❌ خطأ في القراءة", "work"); }
     }
 
-    // 2. الترجمة الاحترافية (الحل الجذري)
-    async function megaTranslate() {
+    // 2. الترجمة من العربي إلى الإنجليزي (حصراً)
+    async function translateToEn() {
         if (!box.value || box.value.startsWith("يتم")) return;
-        showMsg("⏳ جاري الترجمة... يرجى الانتظار");
+        showSt("⏳ جاري الترجمة للإنجليزية...");
         
         try {
-            // تقسيم النص لقطع صغيرة لضمان استلام الرد كاملاً
-            const chunks = box.value.match(/[\s\S]{1,1500}/g) || [box.value];
-            let finalOutput = "";
-
-            for (let chunk of chunks) {
-                const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=ar&dt=t&q=${encodeURIComponent(chunk)}`;
-                const response = await fetch(url);
-                const data = await response.json();
-                
-                // التأكد من تجميع كل أجزاء المصفوفة المترجمة
-                if (data && data[0]) {
-                    data[0].forEach(part => {
-                        if (part[0]) finalOutput += part[0];
-                    });
-                }
+            // "tl=en" تعني الترجمة إلى الإنجليزية
+            const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=${encodeURIComponent(box.value)}`;
+            const response = await fetch(url);
+            const data = await response.json();
+            
+            let result = "";
+            if (data && data[0]) {
+                data[0].forEach(part => { if (part[0]) result += part[0]; });
             }
 
-            if (finalOutput) {
-                box.value = finalOutput;
-                showMsg("✅ تمت الترجمة بنجاح", "success");
-            } else {
-                throw new Error("Empty Result");
+            if (result) {
+                box.value = result;
+                box.style.textAlign = "left"; // تحويل النص لليسار لأنه إنجليزي
+                showSt("✅ تمت الترجمة بنجاح", "done");
             }
-
-        } catch (e) {
-            console.error(e);
-            showMsg("❌ فشل ظهور الترجمة.. تأكدي من الإنترنت", "loading");
-        }
+        } catch (e) { showSt("❌ فشل الاتصال", "work"); }
     }
 
     function zoom(n) {
@@ -130,27 +120,31 @@
     function copy() {
         box.select();
         document.execCommand('copy');
-        showMsg("📋 تم النسخ", "success");
+        showSt("📋 تم النسخ", "done");
     }
 
     function speak() {
         window.speechSynthesis.cancel();
         const m = new SpeechSynthesisUtterance(box.value);
-        m.lang = 'ar-SA';
+        m.lang = box.style.textAlign === "left" ? 'en-US' : 'ar-SA';
         window.speechSynthesis.speak(m);
     }
 
     function printDoc() {
         const w = window.open();
-        w.document.write(`<body dir="rtl" style="padding:30px;"><h2>م. خولة</h2><hr><p style="font-size:20px;">${box.value}</p></body>`);
+        w.document.write(`<body dir="${box.style.textAlign === "left" ? 'ltr' : 'rtl'}" style="padding:30px;"><h2>Smart Engine</h2><hr><p style="font-size:20px;">${box.value}</p></body>`);
         w.print();
     }
 
-    function cls() { if(confirm("مسح؟")) box.value = ""; }
+    function cls() { if(confirm("مسح؟")) { box.value = ""; box.style.textAlign = "right"; } }
 
-    // حفظ تلقائي
-    setInterval(() => localStorage.setItem('kh_db', box.value), 2000);
-    window.onload = () => box.value = localStorage.getItem('kh_db') || "";
+    // الحفظ التلقائي
+    setInterval(() => localStorage.setItem('kh_db_v7', box.value), 2000);
+    window.onload = () => {
+        box.value = localStorage.getItem('kh_db_v7') || "";
+        // إذا كان المحتوى إنجليزي (بدايته أحرف لاتينية) اجعل الاتجاه لليسار
+        if(/^[a-zA-Z]/.test(box.value)) box.style.textAlign = "left";
+    };
 </script>
 
 </body>
