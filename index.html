@@ -3,165 +3,175 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Engineers Assistant</title>
+    <title>Smart Assistant</title>
     
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.1/dist/tesseract.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.4/dist/tesseract.min.js"></script>
 
     <style>
-        :root { --p: #2563eb; --bg: #fdfdfd; --dark: #1e293b; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 12px; color: var(--dark); }
-        .container { max-width: 450px; margin: auto; }
+        :root { --main: #2563eb; --bg: #f8fafc; --card: #ffffff; }
+        body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 10px; color: #1e293b; overflow-x: hidden; }
+        
+        .app-container { max-width: 500px; margin: auto; }
 
-        /* الأزرار العلوية */
-        .tabs { display: flex; gap: 8px; margin-bottom: 15px; }
-        .tab { flex: 1; padding: 12px; border: none; border-radius: 12px; background: #f1f5f9; font-weight: bold; color: #64748b; cursor: pointer; transition: 0.3s; }
-        .tab.active { background: var(--p); color: white; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
+        /* شريط التنقل السفلي - أسهل للموبايل */
+        .nav-bar { display: flex; background: var(--card); padding: 10px; border-radius: 20px; box-shadow: 0 -5px 20px rgba(0,0,0,0.05); position: fixed; bottom: 10px; left: 10px; right: 10px; z-index: 100; }
+        .nav-item { flex: 1; text-align: center; padding: 10px; font-weight: bold; font-size: 0.9rem; color: #64748b; cursor: pointer; border-radius: 15px; }
+        .nav-item.active { background: var(--main); color: white; }
 
-        /* منطقة العمل */
-        .card { background: white; border-radius: 20px; padding: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; }
-        textarea { width: 100%; height: 180px; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 12px; font-size: 16px; box-sizing: border-box; resize: none; margin-bottom: 10px; }
+        .section { display: none; margin-bottom: 80px; animation: fadeIn 0.3s; }
+        .section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* الأزرار الاحترافية */
-        .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-        .btn { padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.9rem; }
-        .btn-blue { background: var(--p); color: white; }
-        .btn-gray { background: #f1f5f9; color: var(--dark); }
+        .card { background: var(--card); border-radius: 25px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; margin-bottom: 15px; }
+        
+        /* النصوص والتعديل */
+        textarea { width: 100%; height: 250px; border: 2px solid #f1f5f9; border-radius: 15px; padding: 15px; font-size: 16px; box-sizing: border-box; outline: none; transition: 0.3s; }
+        textarea:focus { border-color: var(--main); }
 
-        /* آلة حاسبة بتصميم "آيفون" احترافي */
-        .calc { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; background: #f8fafc; padding: 15px; border-radius: 20px; }
-        .calc-screen { grid-column: span 4; background: transparent; text-align: left; font-size: 2rem; padding: 10px; border-bottom: 1px solid #ddd; margin-bottom: 10px; min-height: 50px; overflow: hidden; }
-        .c-btn { padding: 18px; border-radius: 50%; border: none; background: white; font-weight: bold; font-size: 1.2rem; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .c-op { background: #fee2e2; color: #ef4444; }
-        .c-eq { background: #2563eb; color: white; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        button { padding: 14px; border-radius: 15px; border: none; font-weight: bold; cursor: pointer; font-size: 0.9rem; transition: 0.2s; }
+        .btn-p { background: var(--main); color: white; }
+        .btn-s { background: #f1f5f9; color: #1e293b; }
 
-        #status { font-size: 0.75rem; text-align: center; color: var(--p); margin-top: 8px; font-weight: bold; }
+        /* الحاسبة الاحترافية */
+        .calc-screen { width: 100%; height: 80px; background: #f8fafc; border-radius: 15px; text-align: left; font-size: 2.2rem; padding: 15px; box-sizing: border-box; margin-bottom: 15px; color: var(--main); font-family: monospace; overflow: hidden; }
+        .calc-keys { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .key { height: 65px; border-radius: 50%; border: none; background: white; font-weight: bold; font-size: 1.3rem; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .key-op { background: #eff6ff; color: var(--main); }
+        .key-eq { background: var(--main); color: white; }
+
+        #status { font-size: 0.8rem; text-align: center; color: var(--main); margin-bottom: 10px; height: 20px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="tabs">
-        <button class="tab active" onclick="sw('main', this)">المذكرة</button>
-        <button class="tab" onclick="sw('eng', this)">الحاسبة</button>
-        <button class="tab" onclick="sw('ocr', this)">الصور</button>
-    </div>
+<div class="app-container">
+    
+    <div id="status">جاهز للمساعدة..</div>
 
-    <div id="main" class="section">
+    <div id="notes-sec" class="section active">
         <div class="card">
-            <textarea id="txtMain" placeholder="اكتبي ملاحظاتك هنا..."></textarea>
-            <div class="btn-row">
-                <button class="btn btn-blue" onclick="startSpeech()">🎤 إملاء (تحدثي)</button>
-                <button class="btn btn-blue" onclick="playText()">🔊 استماع</button>
-                <button class="btn btn-gray" onclick="translateText()">🌐 ترجمة للعربية</button>
-                <button class="btn btn-gray" style="color:red" onclick="cls()">🗑️ مسح</button>
-            </div>
-            <div id="status">جاهز..</div>
-        </div>
-    </div>
-
-    <div id="eng" class="section" style="display:none">
-        <div class="card">
-            <div id="screen" class="calc-screen">0</div>
-            <div class="calc">
-                <button class="c-btn c-op" onclick="c('C')">AC</button>
-                <button class="c-btn c-op" onclick="c('/')">÷</button>
-                <button class="c-btn c-op" onclick="c('*')">×</button>
-                <button class="c-btn c-op" onclick="c('-')">-</button>
-                <button class="c-btn" onclick="c('7')">7</button>
-                <button class="c-btn" onclick="c('8')">8</button>
-                <button class="c-btn" onclick="c('9')">9</button>
-                <button class="c-btn c-op" onclick="c('+')">+</button>
-                <button class="c-btn" onclick="c('4')">4</button>
-                <button class="c-btn" onclick="c('5')">5</button>
-                <button class="c-btn" onclick="c('6')">6</button>
-                <button class="c-btn c-eq" onclick="c('=')">=</button>
-                <button class="c-btn" onclick="c('1')">1</button>
-                <button class="c-btn" onclick="c('2')">2</button>
-                <button class="c-btn" onclick="c('3')">3</button>
-                <button class="c-btn" onclick="c('0')">0</button>
+            <textarea id="mainTxt" oninput="autoSave()" placeholder="اكتبي أو الصقي النص هنا.."></textarea>
+            <div class="grid">
+                <button class="btn-p" onclick="action('speak')">🔊 قراءة</button>
+                <button class="btn-p" onclick="action('mic')">🎤 إملاء</button>
+                <button class="btn-s" onclick="action('trans')">🌐 ترجمة</button>
+                <button class="btn-s" onclick="action('print')">📄 طباعة</button>
             </div>
         </div>
     </div>
 
-    <div id="ocr" class="section" style="display:none">
+    <div id="ocr-sec" class="section">
         <div class="card">
-            <button class="btn btn-blue" style="width:100%; margin-bottom:10px" onclick="document.getElementById('file').click()">📷 تصوير أو اختيار صورة</button>
-            <input type="file" id="file" hidden accept="image/*" onchange="runOCR(this)">
-            <textarea id="txtOCR" placeholder="النص سيظهر هنا بعد التحليل..."></textarea>
-            <button class="btn btn-gray" style="width:100%" onclick="copyOCR()">📋 نسخ النص</button>
+            <button class="btn-p" style="width: 100%;" onclick="document.getElementById('pic').click()">📷 تصوير أو رفع صورة</button>
+            <input type="file" id="pic" hidden accept="image/*" onchange="extract(this)">
+            <textarea id="ocrTxt" style="margin-top:15px; height: 200px;" placeholder="سيظهر النص المستخرج هنا للتعديل عليه.."></textarea>
+            <div class="grid">
+                <button class="btn-s" onclick="copy('ocrTxt')">📋 نسخ</button>
+                <button class="btn-s" onclick="document.getElementById('mainTxt').value += document.getElementById('ocrTxt').value">📝 نقل للمفكرة</button>
+            </div>
         </div>
+    </div>
+
+    <div id="calc-sec" class="section">
+        <div class="card">
+            <div id="disp" class="calc-screen">0</div>
+            <div class="calc-keys">
+                <button class="key key-op" style="color:red" onclick="k('C')">AC</button>
+                <button class="key key-op" onclick="k('/')">÷</button>
+                <button class="key key-op" onclick="k('*')">×</button>
+                <button class="key key-op" onclick="k('-')">-</button>
+                <button class="key" onclick="k('7')">7</button>
+                <button class="key" onclick="k('8')">8</button>
+                <button class="key" onclick="k('9')">9</button>
+                <button class="key key-op" onclick="k('+')">+</button>
+                <button class="key" onclick="k('4')">4</button>
+                <button class="key" onclick="k('5')">5</button>
+                <button class="key" onclick="k('6')">6</button>
+                <button class="key key-eq" style="grid-row: span 2; height: 140px; border-radius: 30px;" onclick="k('=')">=</button>
+                <button class="key" onclick="k('1')">1</button>
+                <button class="key" onclick="k('2')">2</button>
+                <button class="key" onclick="k('3')">3</button>
+                <button class="key" style="grid-column: span 2; border-radius: 30px; width: 100%;" onclick="k('0')">0</button>
+                <button class="key" onclick="k('.')">.</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="nav-bar">
+        <div class="nav-item active" onclick="tab('notes-sec', this)">📝 مفكرة</div>
+        <div class="nav-item" onclick="tab('ocr-sec', this)">📷 صور</div>
+        <div class="nav-item" onclick="tab('calc-sec', this)">🔢 حاسبة</div>
     </div>
 </div>
 
 <script>
-    // التنقل السلس
-    function sw(id, btn) {
-        document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        document.getElementById(id).style.display = 'block';
-        btn.classList.add('active');
+    // 1. نظام التنقل والتبويبات
+    function tab(id, el) {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        el.classList.add('active');
     }
 
-    // حل مشكلة الإملاء (Speech to Text)
-    function startSpeech() {
-        const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!Speech) return alert("المتصفح لا يدعم الإملاء");
-        
-        const rec = new Speech();
-        rec.lang = 'ar-SA';
-        rec.continuous = false;
-        
-        rec.onstart = () => document.getElementById('status').innerText = "🔴 جاري الاستماع.. تكلمي";
-        rec.onresult = (e) => {
-            document.getElementById('txtMain').value += " " + e.results[0][0].transcript;
-            document.getElementById('status').innerText = "✅ تمت الإضافة";
-        };
-        rec.onerror = () => document.getElementById('status').innerText = "❌ لم أسمعك جيداً، جربي ثانية";
-        rec.start();
+    // 2. وظائف المفكرة (تغليف كامل)
+    const action = (type) => {
+        const txt = document.getElementById('mainTxt');
+        const st = document.getElementById('status');
+
+        if(type === 'speak') {
+            window.speechSynthesis.cancel();
+            let m = new SpeechSynthesisUtterance(txt.value);
+            m.lang = 'ar-SA';
+            window.speechSynthesis.speak(m);
+        } 
+        else if(type === 'mic') {
+            const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if(!Rec) return alert("غير مدعوم");
+            const r = new Rec(); r.lang = 'ar-SA';
+            r.onstart = () => st.innerText = "🎤 اسمعك..";
+            r.onresult = (e) => { txt.value += e.results[0][0].transcript; autoSave(); st.innerText = "✅ تمت الإضافة"; };
+            r.start();
+        }
+        else if(type === 'trans') {
+            st.innerText = "⏳ جاري الترجمة...";
+            fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=ar&dt=t&q=${encodeURIComponent(txt.value)}`)
+            .then(r => r.json()).then(d => { txt.value = d[0][0][0]; autoSave(); st.innerText = "✅ تمت الترجمة"; });
+        }
+        else if(type === 'print') {
+            window.print();
+        }
     }
 
-    // الترجمة الفورية (بدون تعقيد)
-    async function translateText() {
-        const txt = document.getElementById('txtMain');
-        if(!txt.value) return;
-        document.getElementById('status').innerText = "⏳ جاري الترجمة...";
-        try {
-            const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=ar&dt=t&q=${encodeURIComponent(txt.value)}`);
-            const data = await res.json();
-            txt.value = data[0][0][0];
-            document.getElementById('status').innerText = "✅ تمت الترجمة";
-        } catch(e) { document.getElementById('status').innerText = "❌ خطأ في الاتصال"; }
-    }
-
-    // الحاسبة
-    let exp = "";
-    function c(v) {
-        const s = document.getElementById('screen');
-        if(v==='C') { exp = ""; s.innerText = "0"; }
-        else if(v==='=') { try { exp = eval(exp).toString(); s.innerText = exp; } catch { s.innerText = "خطأ"; exp = ""; } }
-        else { exp += v; s.innerText = exp; }
-    }
-
-    // استخراج النصوص (OCR) - نسخة خفيفة ومباشرة
-    async function runOCR(input) {
+    // 3. مستخلص النصوص (OCR) - تغليف مستقل
+    async function extract(input) {
         if(!input.files[0]) return;
-        const status = document.getElementById('status');
-        status.innerText = "⏳ جاري تحليل الصورة...";
+        const st = document.getElementById('status');
+        st.innerText = "⏳ جاري تحليل الصورة...";
         try {
             const { data: { text } } = await Tesseract.recognize(input.files[0], 'ara+eng');
-            document.getElementById('txtOCR').value = text;
-            status.innerText = "✅ تم الاستخراج";
-        } catch(e) { status.innerText = "❌ فشل التحليل"; }
+            document.getElementById('ocrTxt').value = text;
+            st.innerText = "✅ تم استخراج النص";
+        } catch(e) { st.innerText = "❌ فشل التحليل"; }
     }
 
-    function playText() {
-        window.speechSynthesis.cancel();
-        let m = new SpeechSynthesisUtterance(document.getElementById('txtMain').value);
-        m.lang = 'ar-SA';
-        window.speechSynthesis.speak(m);
+    // 4. الحاسبة (نظام مستقل)
+    let cur = "";
+    function k(v) {
+        const d = document.getElementById('disp');
+        if(v === 'C') cur = "";
+        else if(v === '=') { try { cur = eval(cur).toString(); } catch { cur = "Error"; } }
+        else cur += v;
+        d.innerText = cur || "0";
     }
-    function cls() { if(confirm("مسح؟")) document.getElementById('txtMain').value = ""; }
-    function copyOCR() { navigator.clipboard.writeText(document.getElementById('txtOCR').value); alert("تم النسخ"); }
+
+    // 5. الحفظ التلقائي والتوافق
+    function autoSave() { localStorage.setItem('smart_note', document.getElementById('mainTxt').value); }
+    window.onload = () => {
+        if(localStorage.getItem('smart_note')) document.getElementById('mainTxt').value = localStorage.getItem('smart_note');
+    }
+    function copy(id) { document.getElementById(id).select(); document.execCommand('copy'); alert("تم النسخ"); }
 </script>
+
 </body>
 </html>
