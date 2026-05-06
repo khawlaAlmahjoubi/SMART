@@ -3,77 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    
     <link rel="icon" type="image/jpeg" href="icon1999.jpeg">
     <link rel="apple-touch-icon" href="icon1999.jpeg">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    
     <title>Smart Engine Pro | م. خولة</title>
     
     <script src="https://unpkg.com/tesseract.js@v2.1.0/dist/tesseract.min.js"></script>
 
     <style>
         :root { --p: #2563eb; --bg: #f8fafc; --acc: #059669; --err: #dc2626; }
-        body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 10px; color: #1e293b; }
-        
+        body { font-family: system-ui, sans-serif; background: var(--bg); margin: 0; padding: 10px; }
         .card { max-width: 500px; margin: auto; background: white; border-radius: 25px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
-        
         .brand { text-align: center; margin-bottom: 15px; }
-        .brand img { width: 75px; height: 75px; border-radius: 20px; border: 3px solid var(--p); object-fit: cover; margin-bottom: 8px; }
-        .brand h2 { color: var(--p); margin: 0; font-size: 1.4rem; letter-spacing: -0.5px; }
-        .brand small { color: #64748b; font-weight: 800; font-size: 0.85rem; }
-
-        #status { font-size: 0.9rem; text-align: center; padding: 12px; margin-bottom: 12px; border-radius: 12px; display: none; font-weight: bold; border: 1px solid transparent; }
-        .st-work { display: block; background: #eff6ff; color: #1e40af; border-color: #bfdbfe; }
-        .st-done { display: block; background: #dcfce7; color: #15803d; border-color: #bbf7d0; }
-        .st-jump { display: block; background: #fff7ed; color: #9a3412; border-color: #fed7aa; }
-
-        textarea { width: 100%; height: 380px; border: 2px solid #e2e8f0; border-radius: 20px; padding: 15px; font-size: 18px; line-height: 1.6; outline: none; box-sizing: border-box; resize: none; background: #fff; transition: 0.3s; text-align: right; }
-        textarea:focus { border-color: var(--p); box-shadow: 0 0 0 4px rgba(37,99,235,0.1); }
-
-        .toolbar { display: flex; gap: 8px; margin-bottom: 12px; justify-content: center; flex-wrap: wrap; }
-        .t-btn { background: #f1f5f9; border: none; padding: 10px 15px; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 0.85rem; color: #475569; transition: 0.2s; }
-        .t-btn:active { background: #e2e8f0; }
-        .mic-active { background: var(--err) !important; color: white !important; animation: pulse 1s infinite; }
-
-        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-        .btn { padding: 16px; border: none; border-radius: 16px; font-weight: 800; cursor: pointer; color: white; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
+        .brand img { width: 70px; height: 70px; border-radius: 18px; border: 3px solid var(--p); object-fit: cover; }
+        #status { font-size: 0.9rem; text-align: center; padding: 12px; margin-bottom: 12px; border-radius: 12px; display: none; font-weight: bold; border: 1px solid #ddd; }
+        .st-work { display: block; background: #eff6ff; color: #1e40af; }
+        .st-done { display: block; background: #dcfce7; color: #15803d; }
+        textarea { width: 100%; height: 350px; border: 2px solid #e2e8f0; border-radius: 20px; padding: 15px; font-size: 18px; line-height: 1.6; outline: none; box-sizing: border-box; resize: none; background: #fff; text-align: right; }
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 15px; }
+        .btn { padding: 15px; border: none; border-radius: 15px; font-weight: 800; cursor: pointer; color: white; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 5px; }
         .bg-blue { background: var(--p); }
         .bg-green { background: var(--acc); }
+        .bg-red { background: var(--err); }
         .bg-black { background: #1e293b; }
-        .btn:active { transform: scale(0.96); opacity: 0.9; }
-
-        @keyframes pulse { 50% { opacity: 0.6; } }
+        .toolbar { display: flex; gap: 5px; margin-bottom: 12px; justify-content: center; flex-wrap: wrap; }
+        .t-btn { background: #f1f5f9; border: none; padding: 10px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 0.8rem; }
+        .mic-active { background: var(--err) !important; color: white !important; animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0.5; } }
     </style>
 </head>
 <body>
 
 <div class="card">
     <div class="brand">
-        <img src="icon1999.jpeg" alt="Logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2097/2097276.png'">
-        <h2>Smart Engine Pro</h2>
+        <img src="icon1999.jpeg" alt="Logo" onerror="this.style.display='none'">
+        <h2 style="color:var(--p); margin:5px 0;">Smart Engine Pro</h2>
         <small>إصدار المهندسة خولة المحجوبي</small>
     </div>
 
     <div id="status"></div>
 
     <div class="toolbar">
-        <button class="t-btn" onclick="zoom(2)">➕ تكبير</button>
-        <button class="t-btn" onclick="zoom(-2)">➖ تصغير</button>
-        <button id="micBtn" class="t-btn" onclick="toggleSpeech()">🎤 إملاء</button>
-        <button class="t-btn" style="color:var(--acc)" onclick="cleanText()">✨ تنظيف النص</button>
+        <button class="t-btn" onclick="zoom(2)">➕</button>
+        <button class="t-btn" onclick="zoom(-2)">➖</button>
+        <button id="micBtn" class="t-btn" onclick="toggleMic()">🎤 إملاء</button>
+        <button class="t-btn" style="background:#fee2e2; color:red" onclick="stopAll()">🛑 إيقاف الكل</button>
+        <button class="t-btn" style="color:var(--acc)" onclick="cleanText()">✨ تنظيف</button>
     </div>
 
-    <textarea id="box" placeholder="اكتبي هنا، أو ارفعي صورة لاستخراج النص، أو استخدمي الميكروفون..."></textarea>
+    <textarea id="box" placeholder="اكتبي أو ارفعي صورة..."></textarea>
 
     <div class="btn-grid">
-        <button class="btn bg-blue" onclick="document.getElementById('fileIn').click()">📷 استخراج من صورة</button>
-        <button class="btn bg-blue" onclick="hybridTranslate()">🌐 ترجمة ذكية</button>
-        <button class="btn bg-green" onclick="speak()">🔊 قراءة بصوت</button>
-        <button class="btn bg-black" onclick="copy()">📋 نسخ النص</button>
-        <button class="btn bg-black" onclick="printDoc()">📄 طباعة</button>
-        <button class="btn bg-black" style="color:#ff8080" onclick="cls()">🗑️ مسح الكل</button>
+        <button class="btn bg-blue" onclick="document.getElementById('fileIn').click()">📷 استخراج النص</button>
+        <button class="btn bg-blue" onclick="translateLongText()">🌐 ترجمة النص (أي طول)</button>
+        <button class="btn bg-green" onclick="startSpeak()">🔊 قراءة بصوت</button>
+        <button class="btn bg-black" onclick="copyText()">📋 نسخ</button>
+        <button class="btn bg-black" onclick="window.print()">📄 طباعة</button>
+        <button class="btn bg-red" onclick="cls()">🗑️ مسح</button>
     </div>
     
     <input type="file" id="fileIn" hidden accept="image/*" onchange="runOCR(this)">
@@ -91,136 +76,82 @@
         if(type === 'done') setTimeout(() => st.style.display = 'none', 3000);
     }
 
-    // 1. استخراج النص (OCR) - نسخة محسنة
-    async function runOCR(input) {
-        if (!input.files[0]) return;
-        notify("🚀 جاري معالجة الصورة.. يرجى الانتظار ثواني");
-        box.value = "جاري التحليل واستخراج النص...";
-        
-        try {
-            const { data: { text } } = await Tesseract.recognize(
-                input.files[0],
-                'ara+eng',
-                { logger: m => { if(m.status === 'recognizing text') notify(`🚀 جاري التحليل: ${Math.round(m.progress * 100)}%`); } }
-            );
-            box.value = text.trim() || "لم أتمكن من العثور على نص واضح في الصورة.";
-            notify("✅ اكتمل الاستخراج بنجاح", "done");
-        } catch (e) {
-            notify("❌ خطأ في قراءة الصورة", "work");
-            box.value = "";
-        }
-    }
-
-    // 2. الترجمة الهجينة - حل مشكلة خطأ 400 والنصوص الطويلة
-    async function hybridTranslate() {
-        let text = box.value.trim();
+    // 1. ترجمة النصوص الطويلة جداً (بدون مغادرة التطبيق وبدون خطأ 400)
+    async function translateLongText() {
+        const text = box.value.trim();
         if (!text) return;
+        notify("⏳ جاري ترجمة النص بالكامل...");
 
-        const isAr = /[\u0600-\u06FF]/.test(text);
-        const target = isAr ? 'en' : 'ar';
-        const source = isAr ? 'ar' : 'en';
-
-        // إذا كان النص أطول من 1200 حرف، ننتقل لجوجل فوراً لتجنب خطأ 400
-        if (text.length > 1200) {
-            notify("🚀 نص طويل جداً.. جاري النقل لمترجم Google", "st-jump");
-            // قص النص لضمان عدم تجاوز طول الرابط المسموح به في المتصفح
-            const safeText = text.substring(0, 1500);
-            setTimeout(() => {
-                window.open(`https://translate.google.com/?sl=${source}&tl=${target}&text=${encodeURIComponent(safeText)}&op=translate`, '_blank');
-            }, 800);
-            return;
-        }
-
-        notify("⏳ جاري الترجمة داخل التطبيق...");
         try {
-            const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${target}&dt=t&q=${encodeURIComponent(text)}`);
-            const data = await res.json();
-            let out = "";
-            data[0].forEach(p => { if (p[0]) out += p[0]; });
-            box.value = out;
+            const isAr = /[\u0600-\u06FF]/.test(text);
+            const target = isAr ? 'en' : 'ar';
+            
+            // تقسيم النص إلى قطع صغيرة وترجمتها (لضمان عدم التعليق)
+            const chunks = text.match(/[\s\S]{1,2000}/g) || [text];
+            let translatedFull = "";
+
+            for (let chunk of chunks) {
+                const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${target}&dt=t&q=${encodeURIComponent(chunk)}`);
+                const data = await res.json();
+                data[0].forEach(p => { if (p[0]) translatedFull += p[0]; });
+            }
+
+            box.value = translatedFull;
             box.style.textAlign = target === 'en' ? 'left' : 'right';
             notify("✅ تمت الترجمة بنجاح", "done");
         } catch (e) {
-            // في حال فشل الاتصال الداخلي، نستخدم جوجل كخيار بديل
-            notify("⚠️ فشل بسيط.. جاري الفتح في Google", "st-jump");
-            window.open(`https://translate.google.com/?sl=auto&tl=${target}&text=${encodeURIComponent(text)}`, '_blank');
+            notify("❌ خطأ في الاتصال.. حاول مرة أخرى", "done");
         }
     }
 
-    // 3. الإملاء الصوتي
+    // 2. استخراج النص
+    async function runOCR(input) {
+        if (!input.files[0]) return;
+        notify("⏳ جاري تحليل الصورة...");
+        try {
+            const { data: { text } } = await Tesseract.recognize(input.files[0], 'ara+eng');
+            box.value = text.trim();
+            notify("✅ اكتمل الاستخراج", "done");
+        } catch (e) { notify("❌ فشل الاستخراج", "done"); }
+    }
+
+    // 3. التحكم بالميكروفون (المستمع)
     let rec;
-    function toggleSpeech() {
+    function toggleMic() {
         const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!SR) return alert("عذراً، متصفحك لا يدعم التعرف على الصوت.");
-        
+        if (!SR) return alert("المتصفح لا يدعم الصوت");
         if (!rec) {
-            rec = new SR();
-            rec.lang = 'ar-SA';
-            rec.continuous = true;
-            rec.onstart = () => {
-                micBtn.classList.add('mic-active');
-                notify("🎤 أنا أسمعكِ الآن.. تحدثي", "work");
-            };
-            rec.onresult = (e) => {
-                box.value += " " + e.results[e.results.length - 1][0].transcript;
-            };
-            rec.onend = () => {
-                micBtn.classList.remove('mic-active');
-                rec = null;
-            };
+            rec = new SR(); rec.lang = 'ar-SA'; rec.continuous = true;
+            rec.onstart = () => { micBtn.classList.add('mic-active'); notify("🎤 المستمع يعمل...", "work"); };
+            rec.onresult = (e) => { box.value += " " + e.results[e.results.length - 1][0].transcript; };
+            rec.onend = () => { micBtn.classList.remove('mic-active'); rec = null; };
             rec.start();
-        } else {
-            rec.stop();
-        }
+        } else { stopMic(); }
     }
+    function stopMic() { if(rec) { rec.stop(); notify("🛑 توقف الميكروفون", "done"); } }
 
-    // 4. تنسيق وتنظيف النص
-    function cleanText() {
-        if(!box.value) return;
-        // إزالة الفراغات والأسطر الزائدة الناتجة عن الـ OCR
-        box.value = box.value.replace(/[^\S\r\n]{2,}/g, ' ').replace(/\n\s*\n/g, '\n').trim();
-        notify("✨ تم تنظيف وتنسيق النص", "done");
-    }
-
-    // وظائف إضافية (زوم، نسخ، طباعة، مسح)
-    function zoom(n) {
-        let s = parseFloat(window.getComputedStyle(box).fontSize);
-        box.style.fontSize = (s + n) + 'px';
-    }
-
-    function copy() {
-        box.select();
-        document.execCommand('copy');
-        notify("📋 تم نسخ النص", "done");
-    }
-
-    function speak() {
+    // 4. التحكم بالقراءة (المتحدث)
+    function startSpeak() {
         window.speechSynthesis.cancel();
         const m = new SpeechSynthesisUtterance(box.value);
-        m.lang = box.style.textAlign === 'left' ? 'en-US' : 'ar-SA';
+        m.lang = /[\u0600-\u06FF]/.test(box.value) ? 'ar-SA' : 'en-US';
         window.speechSynthesis.speak(m);
+        notify("🔊 جاري القراءة الآن...", "work");
     }
+    function stopSpeak() { window.speechSynthesis.cancel(); notify("🛑 توقف الصوت", "done"); }
 
-    function printDoc() {
-        const w = window.open();
-        const direction = box.style.textAlign === 'left' ? 'ltr' : 'rtl';
-        w.document.write(`<html dir="${direction}"><body style="padding:40px; font-family:sans-serif;"><h2>Smart Engine Pro</h2><hr><p style="font-size:20px; white-space:pre-wrap;">${box.value}</p></body></html>`);
-        w.print();
+    function stopAll() { stopMic(); stopSpeak(); }
+
+    function cleanText() {
+        box.value = box.value.replace(/[^\S\r\n]{2,}/g, ' ').replace(/\n\s*\n/g, '\n').trim();
+        notify("✨ تم التنظيف", "done");
     }
+    function zoom(n) { let s = parseFloat(window.getComputedStyle(box).fontSize); box.style.fontSize = (s + n) + 'px'; }
+    function copyText() { box.select(); document.execCommand('copy'); notify("📋 تم النسخ", "done"); }
+    function cls() { if(confirm("مسح؟")) box.value = ""; }
 
-    function cls() {
-        if(confirm("هل تريدين مسح كل المحتوى؟")) {
-            box.value = "";
-            box.style.textAlign = "right";
-        }
-    }
-
-    // حفظ تلقائي في الذاكرة لضمان عدم ضياع العمل
-    setInterval(() => localStorage.setItem('kh_final_db', box.value), 2000);
-    window.onload = () => {
-        box.value = localStorage.getItem('kh_final_db') || "";
-        if(/^[a-zA-Z]/.test(box.value)) box.style.textAlign = "left";
-    };
+    setInterval(() => localStorage.setItem('kh_final_v_max', box.value), 2000);
+    window.onload = () => box.value = localStorage.getItem('kh_final_v_max') || "";
 </script>
 
 </body>
